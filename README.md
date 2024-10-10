@@ -7,12 +7,12 @@
 
 
 ## Data Analysis
-- Launch **location** on 2D by time [2D-time]
+- Launch **location** on 2D by time [2D-time]\n
   e.g. https://celestrak.org/satcat/launchsites.php
 - Stat char/graph animation by time
-  numbers of launches, like: 人口图 --time
-  global number of active satellites --time
-  number of satellites --type --time
+  - numbers of launches, like: 人口图 --time
+  - global number of active satellites --time
+  - number of satellites --type --time
   
 
 
