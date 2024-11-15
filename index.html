@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <Title> The earth View </Title>
+    <!-- https://d3js.org/ -->
+    <script type="text/javascript" src="d3.v7.min.js"></script>
+    <script src="./node_modules/satellite.js/dist/satellite.min.js"></script>
+    <!-- <script type="module" src="./main.js"></script> -->
+    <style>
+        body {
+            margin: 0;
+        }
+        #orbitButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 10;
+        }        
+        </style>
+</head>
+<body>
+    <button id="orbitButton">Show Orbit</button>
+    <script type="module" src="./main.js"></script>
+</body>
+<!-- <body onload="CreateEarth()"></body> -->
+
+</html>
