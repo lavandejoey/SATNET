@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "satellite.js": "^5.0.0",
+    "three": "^0.170.0",
+    "vite": "^5.4.11"
+  },
+  "name": "starlink-mapper",
+  "version": "1.0.0",
+  "description": "- 3D satellite plotting (Current)   - Highlight specific satellite (by click): highlight its detailed information.",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
