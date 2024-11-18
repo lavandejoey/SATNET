@@ -1,0 +1,42 @@
+/* public/styles/main.css */
+
+body, html, #app {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#stats {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    right: 0;
+    bottom: 40%;
+    background-color: coral;
+}
+
+#cesiumContainer3D {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 92%;
+}
+
+#cesiumContainer2D {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    width: 50%;
+    height: 32%;
+}
+
+#cesiumContainerTimeline {
+    position: absolute;
+    top: 92%;
+    left: 0;
+    width: 100%;
+    height: 8%;
+}

@@ -1,15 +1,16 @@
 {
   "dependencies": {
+    "cesium": "^1.123.1",
     "satellite.js": "^5.0.0",
     "three": "^0.170.0",
     "vite": "^5.4.11",
-    "cesium": "^1.123.1"
+    "vite-plugin-cesium": "^1.2.23",
+    "vite-plugin-static-copy": "^2.1.0"
   },
   "name": "starlink-mapper",
   "version": "1.0.0",
   "description": "- 3D satellite plotting (Current)   - Highlight specific satellite (by click): highlight its detailed information.",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "start": "vite",
     "dev": "vite",

@@ -1,22 +1,21 @@
-// /vite.config.js
-import {defineConfig} from 'vite';
+// vite.config.js
+import { defineConfig } from 'vite';
+import cesium from 'vite-plugin-cesium';
 
 export default defineConfig({
-    // build: {
-    //     rollupOptions: {
-    //         // exclude Cesium from bundle
-    //         external: ['cesium'],
-    //         output: {
-    //             // global variables
-    //             globals: {
-    //                 cesium: 'Cesium',
-    //             },
-    //         },
-    //     },
-    //     assetsInlineLimit: 0,
-    // },
+    build: {
+        target: 'esnext',
+        minify: false,
+        sourcemap: true,
+        commonjsOptions: {
+            transformMixedEsModules: true,
+        },
+    },
+    define: {
+        CESIUM_BASE_URL: JSON.stringify('/'),
+    },
+    plugins: [cesium()],
     optimizeDeps: {
-        // prevent warnings
         include: ['cesium'],
     },
     publicDir: 'public',
