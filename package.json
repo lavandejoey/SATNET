@@ -2,7 +2,8 @@
   "dependencies": {
     "satellite.js": "^5.0.0",
     "three": "^0.170.0",
-    "vite": "^5.4.11"
+    "vite": "^5.4.11",
+    "cesium": "^1.123.1"
   },
   "name": "starlink-mapper",
   "version": "1.0.0",
