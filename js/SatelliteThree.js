@@ -1,4 +1,4 @@
-// /js/Satellite.js
+// /js/SatelliteThree.js
 import * as THREE from 'three';
 import * as satellitejs from 'satellite.js';
 
@@ -142,9 +142,9 @@ export class SatelliteCesium {
 
                 // Validate the data before pushing
                 if (isFinite(latitude) && isFinite(longitude) && isFinite(altitude) && altitude > 0) {
-                    points.push({ latitude, longitude, altitude });
+                    points.push({latitude, longitude, altitude});
                 } else {
-                    console.warn(`Invalid orbit point at time ${time.toISOString()}:`, { latitude, longitude, altitude });
+                    console.warn(`Invalid orbit point at time ${time.toISOString()}:`, {latitude, longitude, altitude});
                 }
             } else {
                 console.warn('Position data is undefined for time:', time.toISOString());

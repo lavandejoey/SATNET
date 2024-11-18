@@ -1,7 +1,7 @@
 // js/three.js
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
-import {SatelliteThree} from '/js/Satellite.js';
+import {SatelliteThree} from '/js/SatelliteThree.js';
 
 // Declare global variables
 let scene, camera, renderer, earth, controls;
