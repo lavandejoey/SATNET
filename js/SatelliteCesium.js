@@ -1,7 +1,8 @@
 // /js/SatelliteCesium.js
 import * as satellitejs from 'satellite.js';
 import * as Cesium from '/node_modules/cesium/Source/Cesium.js';
-let ctx ={
+
+let ctx = {
     DATA_URL: "/data/all_orbits.json",
     PLOT_SIZE: 2,
     TLEs: [],
@@ -14,7 +15,7 @@ export async function loadSatelliteData() {
         const name = tleLines[0].trim().replace(/\s/g, ''); // Fixed regex for whitespace
         const [line1, line2] = tleLines.slice(1, 3);
         if (validateTLE(line1, line2)) {
-            return { id: tleData.id, name: name, tleString: `${name}\n${line1}\n${line2}`, satellite: tleData.satellite };
+            return {id: tleData.id, name: name, tleString: `${name}\n${line1}\n${line2}`, satellite: tleData.satellite};
         } else {
             console.warn('Invalid TLE data:', tleData);
             return null;

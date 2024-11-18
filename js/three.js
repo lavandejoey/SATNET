@@ -90,7 +90,7 @@ async function loadTLEData() {
         }
         // return pre 1000 satellites
         let orbits_json = await response.json();
-        orbits_json = orbits_json.slice(0, 50);
+        orbits_json = orbits_json.slice(0, 10);
         console.log('orbits_json:', orbits_json);
         return orbits_json
     } catch (error) {
