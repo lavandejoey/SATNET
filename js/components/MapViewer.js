@@ -7,15 +7,11 @@ import {CAMERA_MAX_ALTITUDE, DEGREE_TO_METER, POLES_DISTANCE} from "../utils/con
 
 Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 
-export function MapViewer() {
+export async function MapViewer() {
     // set up the basic Cesium viewer
     const view2D = new Cesium.Viewer('cesiumContainer2D', CESIUM_2D_CONFIG);
     // let view2D = new Viewer('cesiumContainer2D',CESIUM_2D_CONFIG);
     view2D.scene.globe.enableLighting = true;
-    // apply sync function
-    ctx.view3D.camera.changed.addEventListener(sync2DView);
-    // sync sensitivity
-    ctx.view3D.camera.percentageChanged = 0.01;
 
     // Home button -> initCamera function
     view2D.homeButton.viewModel.command.beforeExecute.addEventListener(function (e) {
@@ -23,21 +19,30 @@ export function MapViewer() {
         initCamera(ctx.view3D, INITIAL_CAMERA_3D);
     });
 
-    view2D.scene.screenSpaceCameraController.maximumZoomDistance = CAMERA_MAX_ALTITUDE;
-
     // 2D view is all follows 3D -> disable all 2D camera active move
-    view2D.scene.screenSpaceCameraController.enableRotate = false;
-    view2D.scene.screenSpaceCameraController.enableTranslate = false;
-    view2D.scene.screenSpaceCameraController.enableZoom = false;
-    view2D.scene.screenSpaceCameraController.enableTilt = false;
-    view2D.scene.screenSpaceCameraController.enableLook = false;
+    disable2DCameraControls(view2D).then(r => console.log('2D camera controls disabled'));
+
     // no-need separate camera
     // initCamera(view2D, INITIAL_CAMERA_2D);
     ctx.view2D = view2D;
     ctx.canvasHeight = view2D.canvas.clientHeight;
+
+    // apply sync function
+    ctx.view3D.camera.changed.addEventListener(sync2DView);
 }
 
-function sync2DView() {
+async function disable2DCameraControls(viewer) {
+    const controller = viewer.scene.screenSpaceCameraController;
+    controller.maximumZoomDistance = CAMERA_MAX_ALTITUDE;
+    controller.enableRotate = false;
+    controller.enableTranslate = false;
+    controller.enableZoom = false;
+    controller.enableTilt = false;
+    controller.enableLook = false;
+}
+
+
+async function sync2DView() {
     // The center of the view is the point that the 3D camera is focusing on
     // this result -> Cartesian2 is
     const viewCenter = new Cesium.Cartesian2(

@@ -5,9 +5,9 @@ import * as Cesium from 'cesium';
 export const ctx = {
     view3D: null,
     view2D: null,
-    worldPosition:null,
-    cameraAltitude:null,
-    canvasHeight:null
+    worldPosition: null,
+    cameraAltitude: null,
+    canvasHeight: null
 };
 
 export const CESIUM_ACCESS_TOKEN = import.meta.env.VITE_ION_TOKEN || '';
@@ -29,8 +29,9 @@ const CESIUM_SHARE_CONFIG = {
     infoBox: false,
     navigationHelpButton: false,
     helpButton: false,
-    timeline: false,
     clockViewModel: new Cesium.ClockViewModel(CESIUM_SHARE_CLOCK),
+    timeline: false,
+    animation: false,
     //
     sceneModePicker: false,
     geocoder: false,
@@ -42,7 +43,6 @@ export const CESIUM_3D_CONFIG = {
     fullscreenButton: false,
     // 3D globe and disable changing
     sceneMode: Cesium.SceneMode.SCENE3D,
-    animation: true
 };
 
 export const CESIUM_2D_CONFIG = {
@@ -52,5 +52,4 @@ export const CESIUM_2D_CONFIG = {
     // 2D flat mode and disable changing
     sceneMode: Cesium.SceneMode.SCENE2D,
     mapMode2D: Cesium.MapMode2D.ROTATE,
-    animation: false
 };
