@@ -1,17 +1,21 @@
 // /js/cesium.js
-import * as Cesium from '/node_modules/cesium/Source/Cesium.js';
 import '/node_modules/cesium/Build/Cesium/Widgets/widgets.css';
-import {loadSatelliteData, SatelliteCesium} from '/js/SatelliteCesium.js';
 import {MapViewer} from "./components/MapViewer";
 import {GlobeViewer} from "./components/GlobeViewer";
-
-Cesium.Ion.defaultAccessToken = import.meta.env.VITE_ION_TOKEN;
-
 
 async function loadViewer() {
     GlobeViewer();
     MapViewer();
+
+    removeWatermark().then(r => console.log('Watermark removed'));
+
 }
 
-
+async function removeWatermark() {
+    // remove all cesium-viewer-bottom
+    let watermark = document.getElementsByClassName('cesium-viewer-bottom');
+    while (watermark.length > 0) {
+        watermark[0].parentNode.removeChild(watermark[0]);
+    }
+}
 window.onload = loadViewer;

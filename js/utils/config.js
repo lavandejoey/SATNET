@@ -28,7 +28,8 @@ const CESIUM_SHARE_CONFIG = {
     infoBox: false,
     navigationHelpButton: false,
     helpButton: false,
-    timeline: true,
+    timeline: false,
+    clockViewModel: new Cesium.ClockViewModel(CESIUM_SHARE_CLOCK),
     //
     sceneModePicker: false,
     geocoder: false,
@@ -36,17 +37,16 @@ const CESIUM_SHARE_CONFIG = {
 
 export const CESIUM_3D_CONFIG = {
     ...CESIUM_SHARE_CONFIG,
-    // clockViewModel: new Cesium.ClockViewModel(CESIUM_SHARE_CLOCK),
-    homeButton: true,
+    homeButton: false,
     fullscreenButton: false,
     // 3D globe and disable changing
-    sceneMode: Cesium.SceneMode.SCENE3D
+    sceneMode: Cesium.SceneMode.SCENE3D,
+    animation: true
 };
 
 export const CESIUM_2D_CONFIG = {
     ...CESIUM_SHARE_CONFIG,
-    // clockViewModel: new Cesium.ClockViewModel(CESIUM_SHARE_CLOCK),
-    homeButton: false,
+    homeButton: true,
     fullscreenButton: true,
     // 2D flat mode and disable changing
     sceneMode: Cesium.SceneMode.SCENE2D,

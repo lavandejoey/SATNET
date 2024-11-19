@@ -10,10 +10,10 @@ body, html, #app {
 
 #stats {
     position: absolute;
-    top: 0;
+    top: 32%;
     left: 50%;
     right: 0;
-    bottom: 40%;
+    bottom: 8%;
     background-color: coral;
 }
 
@@ -27,7 +27,7 @@ body, html, #app {
 
 #cesiumContainer2D {
     position: absolute;
-    top: 60%;
+    top: 0;
     left: 50%;
     width: 50%;
     height: 32%;
