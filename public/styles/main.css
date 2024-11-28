@@ -10,11 +10,12 @@ body, html, #app {
 
 #stats {
     position: absolute;
-    top: 32%;
+    top: 40%;
     left: 50%;
     right: 0;
-    bottom: 8%;
-    background-color: coral;
+    bottom: 30px;
+    /*bg color and repeated shape TODO */
+    background: #181818 url(../img/img.png) repeat 0 0;
 }
 
 #cesiumContainer3D {
@@ -22,7 +23,7 @@ body, html, #app {
     top: 0;
     left: 0;
     width: 50%;
-    height: 92%;
+    height: 100%;
 }
 
 #cesiumContainer2D {
@@ -30,17 +31,18 @@ body, html, #app {
     top: 0;
     left: 50%;
     width: 50%;
-    height: 32%;
+    height: 40%;
 }
 
 #cesiumContainerWidgets {
     /*bg colour 181818*/
     background-color: #181818;
     position: absolute;
-    top: 92%;
+    /*top: 100%;*/
+    bottom: 0;
     left: 0;
-    width: 100%;
-    height: 8%;
+    right: 0;
+    height: 30px;
     display: flex;
     flex-direction: row;
     align-items: baseline;
@@ -54,7 +56,7 @@ body, html, #app {
 
 #cesiumContainerTimeline {
     left: 136px;
+    height: 30;
     flex: 1; /* Use remaining width */
-    top: 50%;
-    height: 150%;
+    top: -30px;
 }

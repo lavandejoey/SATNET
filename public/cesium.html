@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cesium Globe</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cesium Globe</title>
+    <link href="/node_modules/cesium/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <link rel="stylesheet" href="/styles/main.css">
-  <link href="/node_modules/cesium/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 </head>
 <body>
-<div id="stats"></div>
+<div id="stats">
+    <p>TODO: stat info.</p>
+</div>
 <div id="cesiumContainer3D"></div>
 <div id="cesiumContainer2D"></div>
 <div id="cesiumContainerWidgets">
-<div id="cesiumContainerAnimation"></div>
-<div id="cesiumContainerTimeline"></div>
-<!--  <h1 style="text-align: center; font-size: 1.5em; color: black;" id="timeline">TIMELINE</h1>-->
+    <div id="cesiumContainerAnimation"></div>
+    <div id="cesiumContainerTimeline"></div>
 </div>
 <script type="module" src="/js/cesium.js"></script>
+<script type="module" src="/js/utils/load_orbits.js"></script>
 </body>
 </html>

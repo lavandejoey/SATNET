@@ -7,17 +7,18 @@ export const ctx = {
     view2D: null,
     worldPosition: null,
     cameraAltitude: null,
-    canvasHeight: null
+    canvasHeight: null,
+    ZOOM_THRESHOLD: 1000000,
 };
 
 export const CESIUM_ACCESS_TOKEN = import.meta.env.VITE_ION_TOKEN || '';
 export const CESIUM_SHARE_CLOCK = new Cesium.Clock({
-    startTime: Cesium.JulianDate.fromIso8601("2000-01-01"),
+    startTime: Cesium.JulianDate.fromIso8601("2020-02-01"),
     // current system time
     stopTime: Cesium.JulianDate.now(),
     clockRange: Cesium.ClockRange.LOOP_STOP, // loop when we hit the end time
     clockStep: Cesium.ClockStep.SYSTEM_CLOCK_MULTIPLIER,
-    multiplier: 4000, // how much time to advance each tick
+    multiplier: 10, // how much time to advance each tick
     shouldAnimate: true // Animation on by default
 });
 
