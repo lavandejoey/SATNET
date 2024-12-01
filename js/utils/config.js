@@ -9,6 +9,7 @@ export const ctx = {
     cameraAltitude: null,
     canvasHeight: null,
     ZOOM_THRESHOLD: 1000000,
+    curTotalSatellite: 0,
 };
 
 export const CESIUM_ACCESS_TOKEN = import.meta.env.VITE_ION_TOKEN || '';
