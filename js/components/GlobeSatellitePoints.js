@@ -7,8 +7,8 @@ import {loadOrbitsTLE, loadStarlinkData} from '../utils/load_orbits';
 export async function initializeSatellites() {
     try {
         const [satTle, starlinkData] = await Promise.all([loadOrbitsTLE(), loadStarlinkData()]);
-        console.log(`Loaded ${Object.keys(satTle).length} satellites.`);
-        console.log(`Loaded metadata for ${starlinkData.length} satellites.`);
+        // console.log(`Loaded ${Object.keys(satTle).length} satellites.`);
+        // console.log(`Loaded metadata for ${starlinkData.length} satellites.`);
 
         let currentEntities = ctx.view3D.entities;
         currentEntities.removeAll();

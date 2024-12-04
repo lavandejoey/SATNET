@@ -14,7 +14,7 @@ export const ctx = {
 
 export const CESIUM_ACCESS_TOKEN = import.meta.env.VITE_ION_TOKEN || '';
 export const CESIUM_SHARE_CLOCK = new Cesium.Clock({
-    startTime: Cesium.JulianDate.fromIso8601("2018-01-01"),
+    startTime: Cesium.JulianDate.fromIso8601("2019-11-10"),
     // current system time
     stopTime: Cesium.JulianDate.now(),
     clockRange: Cesium.ClockRange.LOOP_STOP, // loop when we hit the end time

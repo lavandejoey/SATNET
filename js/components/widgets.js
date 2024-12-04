@@ -1,6 +1,7 @@
 // js/components/widgets.js
 import * as Cesium from "cesium";
 import {ctx} from "../utils/config";
+import {initializeSatellites} from "./GlobeSatellitePoints";
 
 export async function addWidgets() {
     // remove all cesium-viewer-bottom
@@ -8,6 +9,12 @@ export async function addWidgets() {
     while (watermark.length > 0) {
         watermark[0].parentNode.removeChild(watermark[0]);
     }
+
+    // Add animation
+    const animationContainer = document.getElementById('cesiumContainerAnimation');
+    const animationViewModel = new Cesium.AnimationViewModel(ctx.view3D.clockViewModel);
+    const animationWidget = new Cesium.Animation(animationContainer, animationViewModel);
+    animationWidget.resize();
 
     // Add timeline
     const timelineContainer = document.getElementById('cesiumContainerTimeline');
@@ -19,20 +26,4 @@ export async function addWidgets() {
         ctx.view3D.clock.currentTime = e.timeJulian;
         ctx.view3D.clock.shouldAnimate = false;
     });
-
-
-    // // Add satellite counter
-    // const counter = document.createElement('div');
-    // counter.id = 'satellite-count';
-    // counter.style.position = 'absolute';
-    // counter.style.top = '10px';
-    // counter.style.right = '10px';
-    // counter.style.color = 'white';
-    // counter.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    // counter.style.padding = '5px';
-    // counter.style.borderRadius = '5px';
-    // counter.style.zIndex = '1000';
-    // counter.innerHTML = 'Total Satellites: 0';
-    // document.body.appendChild(counter);
-
 }
