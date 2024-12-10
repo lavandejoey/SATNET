@@ -1,5 +1,5 @@
 // js/utils/data.js
-import "/node_modules/d3/dist/d3.min.js";
+import * as d3 from "d3";
 import {ctx} from "/js/utils/config";
 import {getCachedData, isCacheValid, saveToCache} from "/js/utils/cacheUtils";
 import * as satellite from "satellite.js";

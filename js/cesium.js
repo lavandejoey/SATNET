@@ -1,16 +1,16 @@
 // /js/cesium.js
-import '/node_modules/cesium/Build/Cesium/Widgets/widgets.css';
+import "cesium/Build/Cesium/Widgets/widgets.css";
 import {MapViewer} from "/js/components/MapViewer";
 import {GlobeViewer} from "/js/components/GlobeViewer";
 import {addWidgets} from "/js/components/widgets";
-import {displaySatellites} from "/js/components/GlobeSatellitePoints";
+import {displaySatellites} from "/js/components/GlobeSatellites";
 import {createStatViz} from "/js/components/StatMap";
 import {loadLaunchLog} from "/js/utils/data";
 
 async function loadViz() {
     /********************************************* Viewer Initialization *********************************************/
     // Load the 3D and 2D viewers
-    GlobeViewer().then(() => console.log('GlobeViewer loaded'));
+    GlobeViewer().then(() => console.log('GlobeViewer loaded, '));
     MapViewer().then(() => console.log('MapViewer loaded'));
 
     // Remove the watermark
