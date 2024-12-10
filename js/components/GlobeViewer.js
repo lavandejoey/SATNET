@@ -8,15 +8,12 @@ Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 
 export async function GlobeViewer() {
     // Set up the basic Cesium viewer
-    const view3D = new Cesium.Viewer('cesiumContainer3D', CESIUM_3D_CONFIG);
+    ctx.view3D = new Cesium.Viewer('cesiumContainer3D', CESIUM_3D_CONFIG);
 
-    view3D.scene.globe.enableLighting = true;
+    ctx.view3D.scene.globe.enableLighting = true;
 
     // sync sensitivity
-    view3D.camera.percentageChanged = 0.01;
+    ctx.view3D.camera.percentageChanged = 0.01;
 
-    initCamera(view3D, INITIAL_CAMERA_3D);
-
-    // Add to global context
-    ctx.view3D = view3D;
+    initCamera(ctx.view3D, INITIAL_CAMERA_3D);
 }

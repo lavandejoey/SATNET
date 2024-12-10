@@ -1,7 +1,5 @@
 // /js/cesium.js
-import * as Cesium from 'cesium';
 import '/node_modules/cesium/Build/Cesium/Widgets/widgets.css';
-import {ctx} from "/js/utils/config";
 import {MapViewer} from "/js/components/MapViewer";
 import {GlobeViewer} from "/js/components/GlobeViewer";
 import {addWidgets} from "/js/components/widgets";
@@ -9,7 +7,7 @@ import {displaySatellites} from "/js/components/GlobeSatellitePoints";
 import {createStatViz} from "/js/components/StatMap";
 import {loadLaunchLog} from "/js/utils/data";
 
-async function loadViewer() {
+async function loadViz() {
     /********************************************* Viewer Initialization *********************************************/
     // Load the 3D and 2D viewers
     GlobeViewer().then(() => console.log('GlobeViewer loaded'));
@@ -22,11 +20,12 @@ async function loadViewer() {
     // Init load global data
     await loadLaunchLog();
 
-    // Load the satellite
-    await displaySatellites();
-
     // create the statistical graphs
     createStatViz();
+
+    // Display the satellites
+    displaySatellites();
 }
 
-window.onload = loadViewer;
+// load page or resize page -> reload the viewer
+window.addEventListener('load', loadViz);

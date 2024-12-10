@@ -26,7 +26,7 @@ export async function addWidgets() {
         ctx.view3D.clock.shouldAnimate = false;
     });
 
-    // Add Dropdown Widget for Selecting Satellite Groups
+    // Add Dropdown Widget for Selecting Satellite Groups filter
     const widgetContainer = document.getElementById('cesiumContainer3DWidgets'); // Ensure this exists in your HTML
     if (widgetContainer) {
         // Create Dropdown Select Element
@@ -41,10 +41,10 @@ export async function addWidgets() {
         dropdown.appendChild(defaultOption);
 
         // Populate Dropdown with Satellite Groups
-        Object.keys(ctx.SAT_GROUP).forEach(group => {
+        Object.values(ctx.SAT_GROUP).forEach(group => {
             const option = document.createElement('option');
-            option.value = group;
-            option.text = group;
+            option.value = group.NAME;
+            option.text = group.NAME;
             dropdown.appendChild(option);
         });
         widgetContainer.appendChild(dropdown);
@@ -54,11 +54,9 @@ export async function addWidgets() {
             const selectedGroup = event.target.value;
             console.log('Selected Satellite Group:', selectedGroup);
             if (selectedGroup === 'All') {
-                // Show all satellites
-                // filterSatellitesByGroup(null); // Assuming null or undefined resets the filter
+                Object.values(ctx.SAT_GROUP).forEach(group => group.SELECTED = true);
             } else {
-                // Filter satellites by the selected group
-                // filterSatellitesByGroup(selectedGroup);
+                Object.values(ctx.SAT_GROUP).forEach(group => group.SELECTED = group.NAME === selectedGroup);
             }
         });
     } else {

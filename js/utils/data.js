@@ -66,12 +66,8 @@ export async function loadLaunchLog() {
     }
 }
 
-export async function loadOrbitsTLEDate(satGroupName) {
+export async function loadOrbitsTLEDate(satGroup) {
     // Check if the satellite name exists ctx.SAT_GROUP
-    const satGroup = ctx.SAT_GROUP[satGroupName];
-    if (satGroup === undefined) {
-        throw new Error(`Invalid satellite group: ${satGroupName}`);
-    }
     const satName = satGroup.NAME;
     const satGroupCacheKey = satGroup.CACHE_KEY;
     const satGroupUrl = satGroup.URL;
@@ -80,7 +76,7 @@ export async function loadOrbitsTLEDate(satGroupName) {
     if (await isCacheValid(satGroupCacheKey)) {
         const cachedData = await getCachedData(satGroupCacheKey);
         if (cachedData) {
-            ctx.SAT_GROUP[satGroupName].DATA = cachedData;
+            satGroup.DATA = cachedData;
             console.log(`Fetched TLE data for ${satName} from cache`);
             return;
         }
@@ -115,17 +111,17 @@ export async function loadOrbitsTLEDate(satGroupName) {
                     SatRec: satRec,
                 });
             } else {
-                console.error(`Failed to process TLE data for ${name}, ld:${launchDate}, rec:${satRec}`);
+                console.warn(`Failed to process TLE data for ${name}, ld:${launchDate}, rec:${satRec}`);
             }
         }
 
-        ctx.SAT_GROUP[satGroupName].DATA = satellites;
+        satGroup.DATA = satellites;
         console.log(`Fetched TLE data for ${satName} from server`);
 
         saveToCache(satGroupCacheKey, satellites).then(() => console.log(`Saved TLE data for ${satName} to cache`));
     } catch (error) {
         console.error(`Failed to fetch TLE data for ${satName}`, error);
-        ctx.SAT_GROUP[satGroupName].DATA = [];
+        satGroup.DATA = [];
     }
 }
 

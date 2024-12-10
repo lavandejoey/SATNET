@@ -24,17 +24,20 @@ export const ctx = {
     SAT_GROUP: {
         STARLINK: {
             NAME: "Starlink",
-            COLOR: Cesium.Color.RED,
+            COLOR: Cesium.Color.ORANGERED,
             CACHE_KEY: "starlink_tle_cache",
             URL: "/data/starlinkTLE.txt", // Configurable via environment if needed
             DATA: null, // To be populated with Starlink TLE data
+            SELECTED: true,
         },
         BEIDOU: {
             NAME: "BEIDOU",
-            COLOR: Cesium.Color.BLUE,
+            COLOR: Cesium.Color.YELLOWGREEN,
             CACHE_KEY: "beidou_tle_cache",
-            URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=beidou&FORMAT=tle",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=beidou&FORMAT=tle",
+            URL: "/data/beidouTLE.txt",
             DATA: null, // To be populated with BEIDOU TLE data
+            SELECTED: true,
         },
     },
 };
