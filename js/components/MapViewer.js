@@ -1,9 +1,9 @@
 // js/viewer2dManage.js
-import * as Cesium from 'cesium';
-import '/node_modules/cesium/Build/Cesium/Widgets/widgets.css';
-import {CESIUM_2D_CONFIG, CESIUM_ACCESS_TOKEN, ctx} from "../utils/config";
-import {initCamera, INITIAL_CAMERA_3D} from "../utils/camera";
-import {CAMERA_MAX_ALTITUDE, CAMERA_MIN_ALTITUDE, DEGREE_TO_METER, POLES_DISTANCE} from "../utils/constants";
+import * as Cesium from "cesium";
+import "/node_modules/cesium/Build/Cesium/Widgets/widgets.css";
+import {CESIUM_2D_CONFIG, CESIUM_ACCESS_TOKEN, ctx} from "/js/utils/config";
+import {initCamera, INITIAL_CAMERA_3D} from "/js/utils/camera";
+import {CAMERA_MAX_ALTITUDE, CAMERA_MIN_ALTITUDE, DEGREE_TO_METER, POLE_DISTANCE_METERS} from "/js/utils/constants";
 
 Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 
@@ -20,7 +20,7 @@ export async function MapViewer() {
     });
 
     // 2D view is all follows 3D -> disable all 2D camera active move
-    disable2DCameraControls(view2D).then(r => console.log('2D camera controls disabled'));
+    disable2DCameraControls(view2D);
 
     // no-need separate camera
     // initCamera(view2D, INITIAL_CAMERA_2D);
@@ -31,7 +31,7 @@ export async function MapViewer() {
     ctx.view3D.camera.changed.addEventListener(sync2DView);
 }
 
-async function disable2DCameraControls(viewer) {
+function disable2DCameraControls(viewer) {
     const controller = viewer.scene.screenSpaceCameraController;
     controller.maximumZoomDistance = CAMERA_MAX_ALTITUDE;
     controller.enableRotate = false;
@@ -72,7 +72,7 @@ async function sync2DView() {
     const mapRatio = CAMERA_MAX_ALTITUDE / ctx.cameraAltitude;
 
     // latitude bound
-    const latitudeBound = POLES_DISTANCE / 2 - (ctx.canvasHeight / 2) / (mapRatio * ctx.canvasHeight) * POLES_DISTANCE;
+    const latitudeBound = POLE_DISTANCE_METERS / 2 - (ctx.canvasHeight / 2) / (mapRatio * ctx.canvasHeight) * POLE_DISTANCE_METERS;
     const latitudeBoundDeg = latitudeBound / DEGREE_TO_METER;
 
     // out of bound

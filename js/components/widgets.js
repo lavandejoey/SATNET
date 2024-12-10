@@ -1,7 +1,6 @@
 // js/components/widgets.js
 import * as Cesium from "cesium";
-import {ctx} from "../utils/config";
-import {initializeSatellites} from "./GlobeSatellitePoints";
+import {ctx} from "/js/utils/config";
 
 export async function addWidgets() {
     // remove all cesium-viewer-bottom
@@ -27,13 +26,6 @@ export async function addWidgets() {
         ctx.view3D.clock.shouldAnimate = false;
     });
 
-    // Add dropdown widget in 3D view for selecting satellites by group
-    const satelliteGroupList = [
-        "Starlink",
-        "OneWeb",
-        "Iridium",
-        "Globalstar",
-    ];
     // Add Dropdown Widget for Selecting Satellite Groups
     const widgetContainer = document.getElementById('cesiumContainer3DWidgets'); // Ensure this exists in your HTML
     if (widgetContainer) {
@@ -49,7 +41,7 @@ export async function addWidgets() {
         dropdown.appendChild(defaultOption);
 
         // Populate Dropdown with Satellite Groups
-        satelliteGroupList.forEach(group => {
+        Object.keys(ctx.SAT_GROUP).forEach(group => {
             const option = document.createElement('option');
             option.value = group;
             option.text = group;

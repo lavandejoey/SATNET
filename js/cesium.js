@@ -1,28 +1,32 @@
 // /js/cesium.js
 import * as Cesium from 'cesium';
-import {ctx} from "./utils/config";
 import '/node_modules/cesium/Build/Cesium/Widgets/widgets.css';
-import {MapViewer} from "./components/MapViewer";
-import {GlobeViewer} from "./components/GlobeViewer";
-import {addWidgets} from "./components/widgets";
-import {initializeSatellites} from "./components/GlobeSatellitePoints";
-import {createStatViz} from "./components/StatMap";
-
+import {ctx} from "/js/utils/config";
+import {MapViewer} from "/js/components/MapViewer";
+import {GlobeViewer} from "/js/components/GlobeViewer";
+import {addWidgets} from "/js/components/widgets";
+import {displaySatellites} from "/js/components/GlobeSatellitePoints";
+import {createStatViz} from "/js/components/StatMap";
+import {loadLaunchLog} from "/js/utils/data";
 
 async function loadViewer() {
-    // // Load the 3D and 2D viewers
-    GlobeViewer().then(r =>         console.log('GlobeViewer loaded'));
-    MapViewer().then(r => console.log('MapViewer loaded'));
+    /********************************************* Viewer Initialization *********************************************/
+    // Load the 3D and 2D viewers
+    GlobeViewer().then(() => console.log('GlobeViewer loaded'));
+    MapViewer().then(() => console.log('MapViewer loaded'));
 
-    // // Load the satellites
-    // initializeSatellites().then(r => console.log('Satellites loaded'));
+    // Remove the watermark
+    addWidgets().then(() => console.log('Widgets loaded'));
 
-    // // Remove the watermark
-    addWidgets().then(r => console.log('Widgets loaded'));
+    /********************************************** Data Initialization **********************************************/
+    // Init load global data
+    await loadLaunchLog();
+
+    // Load the satellite
+    await displaySatellites();
 
     // create the statistical graphs
     createStatViz();
-
 }
 
 window.onload = loadViewer;

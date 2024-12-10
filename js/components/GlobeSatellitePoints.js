@@ -1,47 +1,41 @@
 // js/components/GlobeSatellitePoints.js
-import * as satellite from 'satellite.js';
-import * as Cesium from 'cesium';
-import {ctx} from '../utils/config';
-import {loadOrbitsTLE, loadStarlinkData} from '../utils/load_orbits';
+import * as satellite from "satellite.js";
+import * as Cesium from "cesium";
+import {ctx} from "/js/utils/config";
+import {loadOrbitsTLEDate} from "/js/utils/data";
 
-export async function initializeSatellites() {
+export async function displaySatellites(satGroup = ctx.SAT_GROUP.STARLINK) {
     try {
-        const [satTle, starlinkData] = await Promise.all([loadOrbitsTLE(), loadStarlinkData()]);
-        // console.log(`Loaded ${Object.keys(satTle).length} satellites.`);
-        // console.log(`Loaded metadata for ${starlinkData.length} satellites.`);
-
-        let currentEntities = ctx.view3D.entities;
+        await loadOrbitsTLEDate("STARLINK");
+        const currentEntities = ctx.view3D.entities;
         currentEntities.removeAll();
 
         let totalSatellites = 0;
 
-        Object.keys(satTle).forEach(satName => {
-            const [line1, line2] = satTle[satName];
-            const metadata = starlinkData.find(s => s.spaceTrack.OBJECT_NAME === satName);
-            if (!metadata || !line1 || !line2) return;
-
-            const satrec = satellite.twoline2satrec(line1, line2);
-            currentEntities.add(createSatelliteEntity(satName, satrec, metadata));
+        satGroup.DATA.forEach(satDate => {
+            currentEntities.add(createSatelliteEntity(satDate));
             totalSatellites++;
         });
+
+        console.log(`Total satellites: ${totalSatellites}`);
 
     } catch (error) {
         console.error('Error initializing satellites:', error);
     }
 }
 
-function createSatelliteEntity(satName, satrec, metadata) {
+function createSatelliteEntity(satDate) {
     return {
-        name: satName,
+        name: satDate.Name,
         position: new Cesium.CallbackProperty((time) => {
             const date = Cesium.JulianDate.toDate(time);
 
-            if (date < new Date(metadata.spaceTrack.LAUNCH_DATE)) {
+            if (date < new Date(satDate.Launch_Date)) {
                 return null; // Skip rendering before launch
             }
 
             try {
-                const positionAndVelocity = satellite.propagate(satrec, date);
+                const positionAndVelocity = satellite.propagate(satDate.SatRec, date);
                 const positionEci = positionAndVelocity.position;
                 return eciToCartesian3(positionEci, date);
             } catch (error) {
@@ -50,11 +44,11 @@ function createSatelliteEntity(satName, satrec, metadata) {
         }, false),
         point: {
             pixelSize: 5,
-            color: Cesium.Color.LIGHTCORAL,
+            color: satDate.COLOR,
             heightReference: Cesium.HeightReference.NONE,
         },
         label: {
-            text: satName,
+            text: satDate.Name,
             font: '10px sans-serif',
             fillColor: Cesium.Color.WHITE,
             style: Cesium.LabelStyle.FILL_AND_OUTLINE,

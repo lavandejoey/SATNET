@@ -1,3 +1,5 @@
+// js/components/StatMap.js
+
 // In this 2D statistic graph
 // We get data from 
 // Our graph design is inspired by https://rocketlaunch.org/rocket-launch-recap/2023
@@ -5,41 +7,28 @@
 // On the top: several barchart graphs which can be swithed between launched_site, owner and so on. (dynamic)
 // On the bottom left: pie chart
 // On the bottom right: a line graph（折线图） to show the launched number every year (static)
+import * as Cesium from "cesium";
+import {ctx} from "/js/utils/config";
+import "/node_modules/d3/dist/d3.min.js";
 
+const margin = {top: 20, right: 30, bottom: 40, left: 80};
+const COLOURS = {
+    BUTTON_BG: "lightgray",
+    BUTTON_ACTIVE: "steelblue",
+    BAR_FILL: "steelblue",
+    LINE_STROKE: "steelblue"
+};
 
+let svgBar, xBar, yBar, plotType = "Country";
+let svgLine, xLine, yLine;
 
-
-import * as Cesium from 'cesium';
-import { ctx } from "../utils/config";
-import * as d3 from 'd3';
-let svg, x, y, plot_type;
-const margin = { top: 20, right: 30, bottom: 40, left: 80 };
-
-
-function loadData() {
-    let inputDate = Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime)
-    const formattedDate = inputDate.toISOString();
-    console.log(formattedDate)
-    let res = [];
-    d3.tsv("/data/launchlog.tsv").then(function (data) {
-        data.forEach(function (d) {
-            if (!d["#Launch_Tag"].startsWith("#")) {
-                let parseDate = d3.timeParse("%Y %b %d %H%M:%S");
-                let formatted_date = d3.utcFormat("%Y-%m-%d")(parseDate(d["Launch_Date"]));
-                let dateOBJ = new Date(formatted_date);
-                let data_formatted = {
-                    Launch_Date: dateOBJ,
-                    SatOwner: d["SatOwner"],
-                    SatState: d["SatState"],
-                    Launch_Site: d["Launch_Site"]
-                }
-                res.push(data_formatted)
-            }
-        })
-        initBarPlot();
-        initLineChart(res);
-        setInterval(() => changeTime(res), 1000);
-    }).catch(function (error) { console.log(error) })
+// Utility function to debounce events
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
 }
 
 function changeTime(data) {
@@ -48,223 +37,265 @@ function changeTime(data) {
 }
 
 function updateBarPlot(data, currentDate) {
-    console.log(currentDate);
-    const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
-    const filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
+    try {
+        const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
+        const filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
 
-    let stateCount;
-    if (plot_type === "Country") {
-        stateCount = Array.from(d3.group(filteredData, d => d.SatState), ([key, values]) => ({
-            key: key,
-            value: values.length
-        }));
-    } else if (plot_type === "Agent") {
-        stateCount = Array.from(d3.group(filteredData, d => d.SatOwner), ([key, values]) => ({
-            key: key,
-            value: values.length
-        }));
+        let stateCount;
+        if (plotType === "Country") {
+            stateCount = Array.from(d3.group(filteredData, d => d.SatState), ([key, values]) => ({
+                key,
+                value: values.length
+            }));
+        } else if (plotType === "Agent") {
+            stateCount = Array.from(d3.group(filteredData, d => d.SatOwner), ([key, values]) => ({
+                key,
+                value: values.length
+            }));
+        }
+
+        stateCount.sort((a, b) => b.value - a.value);
+        stateCount = stateCount.slice(0, 5);
+
+        // Update scales
+        xBar.domain([0, d3.max(stateCount, d => d.value)]).nice();
+        yBar.domain(stateCount.map(d => d.key));
+
+        // Update axes
+        svgBar.select(".x-axis")
+            .transition().duration(500)
+            .call(d3.axisBottom(xBar).ticks(5));
+
+        svgBar.select(".y-axis")
+            .transition().duration(500)
+            .call(d3.axisLeft(yBar));
+
+        // Bind data
+        const bars = svgBar.selectAll(".bar")
+            .data(stateCount, d => d.key);
+
+        // Update existing bars
+        bars.transition().duration(500)
+            .attr("y", d => yBar(d.key))
+            .attr("height", yBar.bandwidth())
+            .attr("width", d => xBar(d.value));
+
+        // Enter new bars
+        bars.enter()
+            .append("rect")
+            .attr("class", "bar")
+            .attr("y", d => yBar(d.key))
+            .attr("height", yBar.bandwidth())
+            .attr("x", 0)
+            .attr("width", 0)
+            .style("fill", COLOURS.BAR_FILL)
+            .transition().duration(500)
+            .attr("width", d => xBar(d.value));
+
+        // Remove exiting bars
+        bars.exit()
+            .transition().duration(500)
+            .attr("width", 0)
+            .remove();
+    } catch (error) {
+        console.error("Error updating bar plot:", error);
     }
-
-    stateCount.sort((a, b) => b.value - a.value);
-    stateCount = stateCount.slice(0, 5);
-
-    // scale domain
-    x.domain([0, d3.max(stateCount, d => d.value)]).nice();
-    y.domain(stateCount.map(d => d.key));
-
-    // x and y axis
-    svg.select(".x-axis").transition().duration(500).call(d3.axisBottom(x).ticks(5));
-    svg.select(".y-axis").transition().duration(500).call(d3.axisLeft(y));
-
-    // binds data
-    const bars = svg.selectAll(".bar").data(stateCount, d => d.key);
-
-    // update existing countries' data
-    bars
-        .transition().duration(500)
-        .attr("y", d => y(d.key))
-        .attr("height", y.bandwidth())
-        .attr("x", 0)
-        .attr("width", d => x(d.value));
-
-    // add new data
-    bars
-        .enter()
-        .append("rect")
-        .attr("class", "bar")
-        .attr("y", d => y(d.key))
-        .attr("height", y.bandwidth())
-        .attr("x", 0)
-        .attr("width", 0)
-        .style("fill", "steelblue")
-        .transition().duration(500)
-        .attr("width", d => x(d.value));
-
-    // remove data
-    bars
-        .exit()
-        .transition().duration(500)
-        .attr("width", 0)
-        .remove();
 }
 
 function initBarPlot() {
-    // get the width and height of vmagHistDiv
-    const vmagHistDiv = document.getElementById('vmagHist');
-    const currentWidth = vmagHistDiv.clientWidth;
-    const currentHeight = vmagHistDiv.clientHeight;
+    try {
+        const vmagHistDiv = document.getElementById('vmagHist');
+        const {clientWidth: currentWidth, clientHeight: currentHeight} = vmagHistDiv;
 
-    // set height and width of the plot
-    const width = currentWidth - margin.left - margin.right;
-    const height = currentHeight - margin.top - margin.bottom;
+        const width = currentWidth - margin.left - margin.right;
+        const height = currentHeight - margin.top - margin.bottom;
 
-    // The large graph
-    const svgContainer = d3.select("#vmagHist")
-        .append("svg")
-        .attr("width", currentWidth)
-        .attr("height", currentHeight)
+        // Create SVG container
+        const svgContainer = d3.select("#vmagHist")
+            .append("svg")
+            .attr("width", currentWidth)
+            .attr("height", currentHeight);
 
+        svgBar = svgContainer.append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    svg = svgContainer.append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
+        // Define scales
+        xBar = d3.scaleLinear().range([0, width]);
+        yBar = d3.scaleBand().range([0, height]).padding(0.1);
 
-    // scale
-    x = d3.scaleLinear().range([0, width]);
-    y = d3.scaleBand().range([0, height]).padding(0.1);
+        // Append axes groups
+        svgBar.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", `translate(0,${height})`);
 
-    // x, y scale
-    svg.append("g").attr("class", "x-axis").attr("transform", `translate(0,${height})`);
-    svg.append("g").attr("class", "y-axis");
+        svgBar.append("g")
+            .attr("class", "y-axis");
 
-    // toggle bar
-    plot_type = "Country" // initial plot the top-5 country
-    const toggleBar = svgContainer.append("g")
-        .attr("transform", `translate(0,${margin.top})`);
+        // Create toggle buttons
+        const toggleBar = svgContainer.append("g")
+            .attr("transform", `translate(${margin.left},${margin.top - 30})`);
 
-    const buttons = [
-        { id: "bottom1", label: "Country" },
-        { id: "bottom2", label: "Agent" },
-        // { id: "bottom3", label: "Year" }
-    ]
-    const buttonWidth = margin.left / 2
-    const buttonHeight = margin.top / 2
-    const buttonSpacing = buttonHeight / 4
+        const buttons = [
+            {id: "button-country", label: "Country"},
+            {id: "button-agent", label: "Agent"}
+        ];
 
-    toggleBar.selectAll(".buttom-group")
-        .data(buttons)
-        .enter()
-        .append("g")
-        .attr("class", "button-group")
-        .attr("transform", (d, i) => `translate(0, ${i * (buttonHeight + buttonSpacing)})`)
-        .each(function (d, i) {
-            const group = d3.select(this);
+        const buttonWidth = 80;
+        const buttonHeight = 25;
+        const buttonSpacing = 10;
 
-            group.append("rect")
-                .attr("class", "button-bg")
-                .attr("width", buttonWidth)
-                .attr("height", buttonHeight)
-                .attr("rx", buttonSpacing)
-                .attr("ry", buttonSpacing)
-                .style("fill", "lightgray")
-                .style("cursor", "pointer")
-                .on("click", function () {
-                    d3.selectAll(".button-bg").style("fill", "lightgray");
-                    d3.select(this).style("fill", "steelblue");
-                    console.log(`${d.label} clicked!`);
-                    plot_type = d.label;
-                })
+        const buttonGroups = toggleBar.selectAll(".button-group")
+            .data(buttons)
+            .enter()
+            .append("g")
+            .attr("class", "button-group")
+            .attr("transform", (d, i) => `translate(${i * (buttonWidth + buttonSpacing)}, 0)`);
 
-            group.append("text")
-                .attr("x", buttonWidth / 2)
-                .attr("y", buttonHeight / 2)
-                .attr("dy", "0.35em")
-                .attr("text-anchor", "middle")
-                .text(d.label)
-                .style("font-size", "8px")
-                .style("cursor", "pointer");
-        })
+        buttonGroups.append("rect")
+            .attr("class", "button-bg")
+            .attr("width", buttonWidth)
+            .attr("height", buttonHeight)
+            .attr("rx", 5)
+            .attr("ry", 5)
+            .style("fill", d => d.label === plotType ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG)
+            .style("cursor", "pointer")
+            .on("click", function (event, d) {
+                plotType = d.label;
+                d3.selectAll(".button-bg").style("fill", COLOURS.BUTTON_BG);
+                d3.select(this).style("fill", COLOURS.BUTTON_ACTIVE);
+                updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
+            });
 
-
+        buttonGroups.append("text")
+            .attr("x", buttonWidth / 2)
+            .attr("y", buttonHeight / 2)
+            .attr("dy", "0.35em")
+            .attr("text-anchor", "middle")
+            .text(d => d.label)
+            .style("font-size", "12px")
+            .style("cursor", "pointer");
+    } catch (error) {
+        console.error("Error initializing bar plot:", error);
+    }
 }
 
-function initLineChart(data) {
-    console.log(data)
-    const linePlotDiv = document.getElementById("linePlot");
-    const currentWidth = linePlotDiv.clientWidth;
-    const currentHeight = linePlotDiv.clientHeight;
+function initLineChart() {
+    try {
+        const linePlotDiv = document.getElementById("linePlot");
+        const {clientWidth: currentWidth, clientHeight: currentHeight} = linePlotDiv;
 
-    const width = currentWidth - margin.left - margin.right;
-    const height = currentHeight - margin.top - margin.bottom;
+        const width = currentWidth - margin.left - margin.right;
+        const height = currentHeight - margin.top - margin.bottom;
 
-    const linePlot = d3.select("#linePlot")
-        .append("svg")
-        .attr("width", currentWidth)
-        .attr("height", currentHeight)
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
+        // Create SVG container
+        const svgContainer = d3.select("#linePlot")
+            .append("svg")
+            .attr("width", currentWidth)
+            .attr("height", currentHeight);
 
-    const yearCount = Array.from(d3.group(data, d => {
-        // console.log(d.Launch_Date.getFullYear());
-        return d.Launch_Date.getFullYear()}), 
-        ([key, values]) => ({
-        year: key,
-        value: values.length
-    }));
+        svgLine = svgContainer.append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    yearCount.sort((a, b) => a.year - b.year)
+        // Process data
+        const launchData = ctx.LAUNCHLOG.DATA;
+        if (!Array.isArray(launchData)) {
+            console.error("LaunchLog data is not an array.");
+            return;
+        }
 
-    console.log(yearCount)
+        const yearCount = Array.from(d3.group(launchData, d => d.Launch_Date.getFullYear()), ([key, values]) => ({
+            year: key,
+            value: values.length
+        })).sort((a, b) => a.year - b.year);
 
-    const x_year = d3.scaleLinear().domain(d3.extent(yearCount, d => d.year)).range([0, width]);
-    const y_year = d3.scaleLinear().domain([0, d3.max(yearCount, d => d.value)]).range([height, 0]);
+        // Define scales
+        xLine = d3.scaleLinear()
+            .domain(d3.extent(yearCount, d => d.year))
+            .range([0, width]);
 
-    linePlot.append("g")
-        .attr("transform", `translate(0, ${height})`)
-        .call(d3.axisBottom(x_year).tickFormat(d3.format("d")))
-        .selectAll("text")
-        .style("font-size", "8px");
+        yLine = d3.scaleLinear()
+            .domain([0, d3.max(yearCount, d => d.value)])
+            .range([height, 0]);
 
-    linePlot.append("g")
-        .call(d3.axisLeft(y_year))
-        .selectAll("text")
-        .style("font-size", "8px");
+        // Append axes
+        svgLine.append("g")
+            .attr("transform", `translate(0, ${height})`)
+            .call(d3.axisBottom(xLine).tickFormat(d3.format("d")))
+            .selectAll("text")
+            .style("font-size", "10px");
 
-    const line = d3.line()
-        .x((d) => x_year(d.year))
-        .y((d) => y_year(d.value));
+        svgLine.append("g")
+            .call(d3.axisLeft(yLine))
+            .selectAll("text")
+            .style("font-size", "10px");
 
-    linePlot.append("path")
-        .datum(yearCount)
-        .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-width", 2)
-        .attr("d", line);
+        // Define line generator
+        const line = d3.line()
+            .x(d => xLine(d.year))
+            .y(d => yLine(d.value));
 
+        // Append line path
+        svgLine.append("path")
+            .datum(yearCount)
+            .attr("fill", "none")
+            .attr("stroke", COLOURS.LINE_STROKE)
+            .attr("stroke-width", 2)
+            .attr("d", line);
+    } catch (error) {
+        console.error("Error initializing line chart:", error);
+    }
 }
 
+export function createStatViz() {
+    try {
+        // console.log("Start creating statistical graphs");
 
-export let createStatViz = function () {
-    console.log("start to create statastic graph")
-    const statsDiv = document.getElementById("stats");
-    statsDiv.style.backgroundColor = "blue";
-    let currentWidth = statsDiv.offsetWidth;
-    let currentHeight = statsDiv.offsetHeight;
-    console.log(currentHeight, currentWidth);
-    const vmagHistDiv = document.getElementById("vmagHist");
-    vmagHistDiv.style.width = (currentWidth - 20) + 'px';
-    vmagHistDiv.style.height = (currentHeight - 150) + 'px';
-    vmagHistDiv.style.backgroundColor = "white"
-    vmagHistDiv.style.padding = "10px";  // padding
-    vmagHistDiv.style.borderRadius = "5px";  // round corners
-    const linePlot = document.getElementById("linePlot");
-    linePlot.style.width = (currentWidth - 20) + 'px';
-    linePlot.style.height = (currentHeight - vmagHistDiv.offsetHeight - 22) + 'px';
-    console.log(currentHeight, vmagHistDiv.offsetHeight, linePlot.offsetHeight);
+        const statsDiv = document.getElementById("stats");
+        statsDiv.style.backgroundColor = "blue";
+        const {offsetWidth: currentWidth, offsetHeight: currentHeight} = statsDiv;
+        // console.log(currentHeight, currentWidth);
 
-    linePlot.style.backgroundColor = "white"
-    linePlot.style.padding = "10px";  // padding
-    linePlot.style.borderRadius = "5px";  // round corners
-    linePlot.style.position = "relative";
-    linePlot.style.marginTop = "2px";
-    loadData();
+        const vmagHistDiv = document.getElementById("vmagHist");
+        Object.assign(vmagHistDiv.style, {
+            width: `${currentWidth - 20}px`,
+            height: `${currentHeight - 150}px`,
+            backgroundColor: "white",
+            padding: "10px",
+            borderRadius: "5px"
+        });
+
+        const linePlotDiv = document.getElementById("linePlot");
+        Object.assign(linePlotDiv.style, {
+            width: `${currentWidth - 20}px`,
+            height: `${currentHeight - vmagHistDiv.offsetHeight - 22}px`,
+            backgroundColor: "white",
+            padding: "10px",
+            borderRadius: "5px",
+            position: "relative",
+            marginTop: "2px"
+        });
+
+        initBarPlot();
+        initLineChart();
+        updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
+
+        // Handle window resize for responsiveness
+        window.addEventListener('resize', debounce(() => {
+            console.log("Window resized, updating charts");
+            // Clear existing SVGs
+            d3.select("#vmagHist").select("svg").remove();
+            d3.select("#linePlot").select("svg").remove();
+
+            // Reinitialize plots
+            initBarPlot();
+            initLineChart();
+            updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
+        }, 300));
+
+        // Update time every second
+        setInterval(() => changeTime(ctx.LAUNCHLOG.DATA), 1000);
+        console.log("Finished creating statistical graphs");
+    } catch (error) {
+        console.error("Error creating statistical visualization:", error);
+    }
 }
