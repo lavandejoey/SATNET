@@ -10,6 +10,21 @@ export const ctx = {
     canvasHeight: null,
     ZOOM_THRESHOLD: 1000000,
     curTotalSatellite: 0,
+
+    // Satellite data
+    CACHE_DURATION: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+    SAT_GROUP: {
+        STARLINK: {
+            NAME: "Starlink",
+            COLOR: Cesium.Color.RED,
+            SOURCE_URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle",
+        },
+        BEIDOU: {
+            NAME: "BEIDOU",
+            COLOR: Cesium.Color.BLUE,
+            SOURCE_URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=beidou&FORMAT=tle"
+        },
+    },
 };
 
 export const CESIUM_ACCESS_TOKEN = import.meta.env.VITE_ION_TOKEN || '';

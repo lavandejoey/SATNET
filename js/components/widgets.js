@@ -26,4 +26,52 @@ export async function addWidgets() {
         ctx.view3D.clock.currentTime = e.timeJulian;
         ctx.view3D.clock.shouldAnimate = false;
     });
+
+    // Add dropdown widget in 3D view for selecting satellites by group
+    const satelliteGroupList = [
+        "Starlink",
+        "OneWeb",
+        "Iridium",
+        "Globalstar",
+    ];
+    // Add Dropdown Widget for Selecting Satellite Groups
+    const widgetContainer = document.getElementById('cesiumContainer3DWidgets'); // Ensure this exists in your HTML
+    if (widgetContainer) {
+        // Create Dropdown Select Element
+        const dropdown = document.createElement('select', {
+            'id': 'satelliteGroupDropdown',
+        });
+
+        // Create Default Option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = 'All';
+        defaultOption.text = 'All';
+        dropdown.appendChild(defaultOption);
+
+        // Populate Dropdown with Satellite Groups
+        satelliteGroupList.forEach(group => {
+            const option = document.createElement('option');
+            option.value = group;
+            option.text = group;
+            dropdown.appendChild(option);
+        });
+        widgetContainer.appendChild(dropdown);
+
+        // Event Listener for Dropdown Change
+        dropdown.addEventListener('change', (event) => {
+            const selectedGroup = event.target.value;
+            console.log('Selected Satellite Group:', selectedGroup);
+            if (selectedGroup === 'All') {
+                // Show all satellites
+                // filterSatellitesByGroup(null); // Assuming null or undefined resets the filter
+            } else {
+                // Filter satellites by the selected group
+                // filterSatellitesByGroup(selectedGroup);
+            }
+        });
+    } else {
+        console.warn("Widget container element not found.");
+    }
+
+
 }

@@ -3,14 +3,13 @@ import * as Cesium from 'cesium';
 import '/node_modules/cesium/Build/Cesium/Widgets/widgets.css';
 import {CESIUM_2D_CONFIG, CESIUM_ACCESS_TOKEN, ctx} from "../utils/config";
 import {initCamera, INITIAL_CAMERA_3D} from "../utils/camera";
-import {CAMERA_MAX_ALTITUDE, DEGREE_TO_METER, POLES_DISTANCE} from "../utils/constants";
+import {CAMERA_MAX_ALTITUDE, CAMERA_MIN_ALTITUDE, DEGREE_TO_METER, POLES_DISTANCE} from "../utils/constants";
 
 Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 
 export async function MapViewer() {
     // set up the basic Cesium viewer
     const view2D = new Cesium.Viewer('cesiumContainer2D', CESIUM_2D_CONFIG);
-    // let view2D = new Viewer('cesiumContainer2D',CESIUM_2D_CONFIG);
     view2D.scene.globe.enableLighting = true;
 
     // Home button -> initCamera function
@@ -54,9 +53,16 @@ async function sync2DView() {
     const cartesian = ctx.view3D.camera.pickEllipsoid(viewCenter);
     ctx.worldPosition = ctx.view3D.scene.camera.pickEllipsoid(viewCenter);
     const view3DCartographic = ellipsoid.cartesianToCartographic(cartesian);
+
     // Get the distance between the world position of the point the camera is focusing on, and the camera's world position
+    // Cesium.Cartesian3.distance(ctx.worldPosition, ctx.view3D.scene.camera.positionWC)
+    // lower the CAMERA_MIN_ALTITUDE -> CAMERA_MIN_ALTITUDE
+    // higher the CAMERA_MAX_ALTITUDE -> CAMERA_MAX_ALTITUDE
     ctx.cameraAltitude = Math.min(
-        Cesium.Cartesian3.distance(ctx.worldPosition, ctx.view3D.scene.camera.positionWC),
+        Math.max(
+            Cesium.Cartesian3.distance(ctx.worldPosition, ctx.view3D.scene.camera.positionWC) * 2,
+            CAMERA_MIN_ALTITUDE
+        ),
         CAMERA_MAX_ALTITUDE
     );
 
@@ -76,10 +82,6 @@ async function sync2DView() {
         Cesium.Math.toRadians(newCameraLatitude),
         ctx.cameraAltitude
     );
-
-    // position comparison
-    // console.log('oldPosition', ctx.view2D.camera.positionCartographic);
-    // console.log('newPosition', [view3DCartographic.longitude, Cesium.Math.toRadians(newCameraLatitude), ctx.cameraAltitude]);
 
     ctx.view2D.camera.setView({
         destination: newPosition,

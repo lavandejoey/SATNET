@@ -1,10 +1,37 @@
 // js/utils/load_orbits.js
 import * as satellite from 'satellite.js';
+import {ctx} from "./config";
 
-// const STARTLINKS_TLE_URL = "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle";
-const STARTLINKS_TLE_URL = "data/starlinkTLE.txt";
+const CACHE_TLE_KEY = "startlinks_tle_cache";
+const CACHE_JSON_KEY = "starlink_data_cache";
+const CACHE_EXPIRY_KEY = "cache_expiry";
+
+// Utility to check if cache is still valid
+function isCacheValid() {
+    const expiry = localStorage.getItem(CACHE_EXPIRY_KEY);
+    return expiry && new Date().getTime() < parseInt(expiry, 10);
+}
+
+// Save data to cache
+function saveToCache(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+    localStorage.setItem(CACHE_EXPIRY_KEY, (new Date().getTime() + ctx.CACHE_DURATION).toString());
+}
+
+
+const STARTLINKS_TLE_URL = "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle";
+
+// const STARTLINKS_TLE_URL = "data/starlinkTLE.txt";
 
 export async function loadOrbitsTLE() {
+    // Check if cache is still valid
+    if (isCacheValid()) {
+        const cachedData = localStorage.getItem(CACHE_TLE_KEY);
+        if (cachedData) {
+            return JSON.parse(cachedData);
+        }
+    }
+
     const response = await fetch(STARTLINKS_TLE_URL);
     const text = (await response.text()).replaceAll('\r', '');
     const lines = text.split('\n');
