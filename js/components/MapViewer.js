@@ -13,10 +13,10 @@ export async function MapViewer() {
     ctx.view2D.scene.globe.enableLighting = true;
 
     // Home button -> initCamera function
-    ctx.view2D.homeButton.viewModel.command.beforeExecute.addEventListener(function (e) {
-        e.cancel = true;
-        initCamera(ctx.view3D, INITIAL_CAMERA_3D);
-    });
+    // ctx.view2D.homeButton.viewModel.command.beforeExecute.addEventListener(function (e) {
+    //     e.cancel = true;
+    //     initCamera(ctx.view3D, INITIAL_CAMERA_3D);
+    // });
 
     // 2D view is all follows 3D -> disable all 2D camera active move
     disable2DCameraControls(ctx.view2D);
