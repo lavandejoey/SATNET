@@ -16,7 +16,7 @@ npm install
 - **start**: Starts the Vite development server `npm start` or `npm run dev`.
 - **build**: Builds the project for production `npm run build`.
 - **serve**: Serves the built project for preview `npm run serve`.
-
+- **web**: http://localhost:5173/cesium.html
 
 # Functions TODOs
 ## 3D Animation

@@ -82,6 +82,13 @@ export const ctx = {
             SELECTED: true,
         }
     },
+
+    SITES:{
+        NAME: "Site",
+        CACHE_KEY: "site_cache",
+        URL: "/data/sites.tsv", // Configurable via environment if needed
+        DATA: null, // To be populated with launch log data
+    },
 };
 
 // Cesium Access Token from environment variables
@@ -125,8 +132,8 @@ export const CESIUM_3D_CONFIG = {
 // 2D Cesium Viewer Configuration
 export const CESIUM_2D_CONFIG = {
     ...CESIUM_SHARE_CONFIG,
-    homeButton: true,
-    fullscreenButton: true,
+    homeButton: false,
+    fullscreenButton: false,
     sceneMode: Cesium.SceneMode.SCENE2D, // Fixed to 2D mode
-    mapMode2D: Cesium.MapMode2D.ROTATE,
+    // mapMode2D: Cesium.MapMode2D.ROTATE,
 };

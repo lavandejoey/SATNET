@@ -6,7 +6,7 @@ import * as satellite from "satellite.js";
 
 // Keep col: #Launch_Tag, Launch_Date, Piece, Name, PLName, SatOwner, SatState, Launch_Site
 const REQUIRED_COLUMNS = ["#Launch_Tag", "Launch_Date", "Piece", "Name", "PLName", "SatOwner", "SatState", "Launch_Site"];
-
+const SITE_REQUIRED_COLUMNS = ["#Site", "Longitude", "Latitude"];
 function parseStringDate(rawDatetime) {
     rawDatetime = rawDatetime.replaceAll('?', '').slice(0, 16);
 
@@ -33,7 +33,39 @@ function cleanDataColumns(data, columns) {
             return cleanedRow;
         });
 }
+export async function loadSites() {
+    
+    if (await isCacheValid(ctx.SITES.CACHE_KEY)) {
+        const cachedData = await getCachedData(ctx.SITES.CACHE_KEY);
+        ctx.SITES.DATA = cachedData;
+        console.log("Fetched sites data from cache");
+        return;
+    }
+    
+    try {
+        const data = await d3.dsv('\t', ctx.SITES.URL);
+        const parsedData = data.map(row => ({
+            ...row
+        }));
+        const cleanedData = cleanDataColumns(parsedData, SITE_REQUIRED_COLUMNS);
 
+        ctx.SITES.DATA = cleanedData.reduce((acc, site) => {
+            const siteKey = site["#Site"].trim(); 
+            const longitude = parseFloat(site["Longitude"]); 
+            const latitude = parseFloat(site["Latitude"]); 
+        
+            acc[siteKey] = { Longitude: longitude, Latitude: latitude };
+            return acc;
+        }, {});
+
+        console.log("Fetched sites data from server");
+
+        saveToCache(ctx.SITES.CACHE_KEY, ctx.SITES.DATA, ctx.CACHE_DURATION).then(() => console.log("Saved launch log data to cache"));
+    } catch (error) {
+        console.error("Failed to fetch sites data", error);
+        ctx.SITES.DATA = [];
+    }
+}
 export async function loadLaunchLog() {
     if (await isCacheValid(ctx.LAUNCHLOG.CACHE_KEY)) {
         const cachedData = await getCachedData(ctx.LAUNCHLOG.CACHE_KEY);

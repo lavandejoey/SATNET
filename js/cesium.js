@@ -4,8 +4,9 @@ import {MapViewer} from "/js/components/MapViewer";
 import {GlobeViewer} from "/js/components/GlobeViewer";
 import {addWidgets} from "/js/components/widgets";
 import {displaySatellites} from "/js/components/GlobeSatellites";
+import {display2DSatellites} from "/js/components/MapSatellites";
 import {createStatViz} from "/js/components/StatMap";
-import {loadLaunchLog} from "/js/utils/data";
+import {loadLaunchLog, loadSites} from "/js/utils/data";
 import {ctx} from "/js/utils/config";
 
 async function loadingPage() {
@@ -26,6 +27,7 @@ async function loadViz() {
     loadingPage().then(() => console.log('Loading page'));
 
     /********************************************* Viewer Initialization *********************************************/
+    // Load the 3D and 2D viewers
     GlobeViewer().then(() => console.log('GlobeViewer loaded, '));
     MapViewer().then(() => console.log('MapViewer loaded'));
 
@@ -35,12 +37,17 @@ async function loadViz() {
     /********************************************** Data Initialization **********************************************/
     // Init load global data
     await loadLaunchLog();
+    // Init load site data
+    await loadSites();
 
     // create the statistical graphs
     createStatViz();
 
-    // Display the satellites
+    // Display the satellites in 3D
     displaySatellites();
+
+    //Display the satellites in 2D
+    display2DSatellites();
 }
 
 // load page or resize page -> reload the viewer
