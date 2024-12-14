@@ -9,7 +9,7 @@
 // On the bottom right: a line graph（折线图） to show the launched number every year (static)
 import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
-import * as d3 from "d3";
+import "/node_modules/d3/dist/d3.min.js";
 
 const margin = {top: 20, right: 30, bottom: 40, left: 80};
 const COLOURS = {

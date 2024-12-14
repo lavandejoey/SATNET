@@ -1,5 +1,5 @@
 // js/utils/data.js
-import * as d3 from "d3";
+import "/node_modules/d3/dist/d3.min.js";
 import {ctx} from "/js/utils/config";
 import {getCachedData, isCacheValid, saveToCache} from "/js/utils/cacheUtils";
 import * as satellite from "satellite.js";
@@ -128,20 +128,67 @@ export async function loadOrbitsTLEDate(satGroup) {
 function satellitesAlignments(satGroup, rawName) {
     let name, launchDate;
     switch (satGroup) {
+        /****************************************** Communication Satellites ******************************************/
         case ctx.SAT_GROUP.STARLINK:
             name = rawName.replaceAll('-', ' ').split(' ').slice(0, 2).join(' ');
             launchDate = ctx.LAUNCHLOG.DATA.find(row => row.Name.toLowerCase() === name.toLowerCase())?.Launch_Date;
             break;
+        /******************************************* Navigation Satellites *******************************************/
         case ctx.SAT_GROUP.BEIDOU:
             // "BEIDOU-2 M4 (C12)       "->"BEIDOU-2 M4"
-            name = rawName.split(' ').slice(0, 2).join(' ');
-            launchDate = ctx.LAUNCHLOG.DATA.find(row => row.PLName.toLowerCase() === name.toLowerCase())?.Launch_Date;
+            name = rawName.split("(")[0].trim()
+                .replace("BEIDOU-", "Beidou-")
+                .replace(" IGSO-", " I")
+                .replace(" M", " M")
+                .replaceAll("S", "-S")
+                .replace("Q", "Q")
+                //Beidou-3-S I1-S -> Beidou-3 I1-S, Beidou-2-S W1-S -> Beidou-2 W1-S
+                .replace(/Beidou-(\d+)-S\s*(\w+)/, "Beidou-$1 $2");
+            launchDate = ctx.LAUNCHLOG.DATA.find(row => {
+                const plName = row.PLName.split("(")[0].trim().toLowerCase();
+                return plName === name.toLowerCase() || plName === (name + "Q").toLowerCase();
+            })?.Launch_Date;
+            // console.log(`Beidou: ${rawName}->${name}, ${launchDate}`);
+            break;
+        case ctx.SAT_GROUP.GALILEO:
+            // take number from the end of string "GSAT0206 (GALILEO 10)   " -> "10" / "GSAT0103 (GALILEO-FM3)  " -> "3"
+            const namePrefix = "GalileoSat-";
+            const trimmedName = rawName.trim();
+            const match = trimmedName.match(/\(GALILEO(?:-([A-Z]+)(\d*))?\s*(\d+)?\)/);
+            if (!match) return null; // No match found, return null or handle error
+            let number;
+            const prefixGroup = match[1]; // e.g. "FM" or "PFM" (might be undefined if not present)
+            const fmNumber = match[2];    // e.g. "3" if "GALILEO-FM3"
+            const standaloneNumber = match[3]; // e.g. "10" if "GALILEO 10"
+
+            if (standaloneNumber) { // "GALILEO X" format
+                number = standaloneNumber;
+            } else if (prefixGroup) { // "GALILEO-FM#" or "GALILEO-PFM"
+                if (prefixGroup === "PFM") { // PFM corresponds to satellite number 1
+                    number = "1";
+                } else { // FM group, number should be in fmNumber
+                    number = fmNumber;
+                }
+            }
+            name = `${namePrefix}${number}`;
+
+            launchDate = ctx.LAUNCHLOG.DATA.find(row => row.Name.toLowerCase() === name.toLowerCase())?.Launch_Date;
+            // console.log(`Galileo: ${name}, ${launchDate}`);
+            break;
+        /********************************************* Weather Satellites *********************************************/
+        case ctx.SAT_GROUP.NOAA:
+            name = rawName.split("(")[0].trim().replaceAll(' ', '-');
+            launchDate = ctx.LAUNCHLOG.DATA.find(row => row.Name.toLowerCase().replaceAll(' ', '-') === name.toLowerCase())?.Launch_Date;
+            // console.log(`NOAA: ${name}, ${launchDate}`);
+            break;
+        case ctx.SAT_GROUP.GEODETIC:
+            name = rawName.split("(")[0].replaceAll(/ 1$/g, "").replaceAll("COSMOS", "Kosmos").trim().replaceAll(" ", "-");
+            launchDate = ctx.LAUNCHLOG.DATA.find(row => row.Name.toLowerCase().replaceAll(" ", "-") === name.toLowerCase())?.Launch_Date;
             break;
         default:
             console.error(`Invalid satellite group: ${satGroup}`);
             break;
     }
-    // console.log(`Satellite: ${name}, Launch Date: ${launchDate}`);
-
+    if (!launchDate) console.warn(`Geodetic: ${rawName} --> ${name}, ${launchDate}`);
     return [name, launchDate];
 }

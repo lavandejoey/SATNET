@@ -20,11 +20,25 @@ body, html, #app {
 }
 
 #cesiumContainer3D {
+    background-color: rgba(0, 0, 0, 0) !important;
     position: absolute;
     top: 0;
     left: 0;
     width: 50%;
     height: 100%;
+}
+
+#cesiumContainer3DWidgets {
+    background-color: rgba(0, 0, 0, 0) !important;
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-start;
 }
 
 #cesiumContainer2D {
@@ -57,7 +71,71 @@ body, html, #app {
 
 #cesiumContainerTimeline {
     left: 136px;
-    height: 30;
+    /*height: 30;*/
     flex: 1; /* Use remaining width */
     top: -30px;
+}
+
+/* Loading Overlay */
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: visible; /* Visible state */
+    transition: opacity 1s ease, visibility 1s ease; /* Transition for opacity and visibility */
+}
+
+#loadingOverlay.hidden {
+    opacity: 0; /* Fully transparent */
+    visibility: hidden; /* Hidden state */
+}
+
+.spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.cesium-selection-wrapper {
+    border: 2px dashed red !important; /* Change the border color and style */
+    border-radius: 50%; /* Make it circular */
+    box-shadow: 0 0 5px 5px rgba(255, 0, 0, 0.5); /* Add a shadow */
+    position: absolute;
+    width: 50px !important;
+    height: 50px !important;
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 0.2s, opacity 0.2s ease-in;
+}
+
+.cesium-selection-wrapper-visible {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.2s ease-out;
+}
+
+.cesium-selection-wrapper svg {
+    fill: none !important;
+    stroke: none !important;
+    stroke-width: 1.1px;
 }

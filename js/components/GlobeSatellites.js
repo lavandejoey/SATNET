@@ -4,46 +4,118 @@ import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
 import {loadOrbitsTLEDate} from "/js/utils/data";
 
+export function handleSatelliteClick(viewer) {
+    const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+    handler.setInputAction(async click => {
+        const pickedObject = viewer.scene.pick(click.position);
+        if (Cesium.defined(pickedObject) && pickedObject.id) {
+            const satelliteEntity = pickedObject.id;
+
+            // Show its label
+            if (satelliteEntity.label) {
+                satelliteEntity.label.show = true;
+            }
+
+            // Remove the previously drawn orbit if it exists
+            if (ctx.currentOrbitEntity) {
+                viewer.entities.remove(ctx.currentOrbitEntity);
+                ctx.currentOrbitEntity = null;
+            }
+
+            // Retrieve the satellite's TLE/propagation data from its properties
+            const satData = satelliteEntity.properties?.satData?.getValue();
+
+            if (satData && satData.SatRec) {
+                // Generate orbit positions for a certain time span, for example 1 day
+                const orbitPositions = [];
+                const startTime = Cesium.JulianDate.now();
+                const interval = 30;
+                // Sample orbit every 10 minutes for 24 hours: 24h * 60min / 10min = 144 points
+                for (let minutes = 0; minutes < 1440 + interval; minutes += interval) {
+                    const time = Cesium.JulianDate.addMinutes(startTime, minutes, new Cesium.JulianDate());
+                    const date = Cesium.JulianDate.toDate(time);
+
+                    try {
+                        const {position} = satellite.propagate(satData.SatRec, date);
+                        const cartesian = eciToCartesian3(position, date);
+                        if (cartesian) {
+                            orbitPositions.push(cartesian);
+                        }
+                    } catch (error) {
+                        console.warn(`Error propagating orbit for ${satelliteEntity.name}:`, error);
+                    }
+                }
+
+                // Create a polyline entity to visualize the orbit
+                ctx.currentOrbitEntity = viewer.entities.add({
+                    name: `${satelliteEntity.name}-orbit`,
+                    polyline: {
+                        positions: orbitPositions,
+                        width: 2,
+                        material: Cesium.Color.YELLOW,
+                        clampToGround: false
+                    }
+                });
+            }
+
+            console.log("Satellite clicked:", {
+                name: satelliteEntity.name,
+                position: satelliteEntity.position?.getValue(Cesium.JulianDate.now()),
+                label: satelliteEntity.label?.text,
+            });
+        }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+}
+
 export function displaySatellites() {
     try {
         const currentEntities = ctx.view3D.entities;
         currentEntities.removeAll();
 
-        // Load the satellite
-        for (let satGroup of Object.values(ctx.SAT_GROUP)) {
-            loadOrbitsTLEDate(satGroup).then(() => {
-                console.log(`${satGroup.DATA.length} satellites for ${satGroup.NAME} loaded`);
+        // Iterate over all satellite groups
+        Object.entries(ctx.SAT_GROUP).forEach(([groupName, satGroup]) => {
+            satGroup.ENTITY = []; // Initialize storage for this group's entities
 
-                satGroup.DATA.forEach(satDate => {
-                    const satelliteEntity = createSatelliteEntity(satGroup, satDate);
-                    if (satelliteEntity) {
-                        currentEntities.add(satelliteEntity);
-                    }
-                });
+            if (!satGroup.SELECTED) {
+                return; // Skip rendering if the group is not selected
+            }
+
+            loadOrbitsTLEDate(satGroup)
+                .then(() => {
+                    console.log(`${satGroup.DATA.length} satellites for ${satGroup.NAME} loaded`);
+
+                    satGroup.DATA.forEach(satData => {
+                        const satelliteEntity = createSatelliteEntity(satGroup, satData);
+                        if (satelliteEntity) {
+                            currentEntities.add(satelliteEntity);
+                            satGroup.ENTITY.push(satelliteEntity.name);
+                        }
+                    });
+                }).catch(error => {
+                console.error(`Failed to load satellite data for group ${satGroup.NAME}:`, error);
             });
-        }
-
+        });
     } catch (error) {
-        console.error('Error initializing satellites:', error);
+        console.error("Error initializing satellites:", error);
     }
 }
 
 function createSatelliteEntity(satGroup, satData) {
     return {
         name: satData.Name,
-        position: new Cesium.CallbackProperty((time) => {
+        position: new Cesium.CallbackProperty(time => {
             const date = Cesium.JulianDate.toDate(time);
 
-            if (date < new Date(satData.Launch_Date)) {
-                return null; // Skip rendering before launch
+            if (date < new Date(satData.Launch_Date) || satGroup.SELECTED === false) {
+                return null; // Skip rendering before launch or if not selected
             }
 
             try {
-                const positionAndVelocity = satellite.propagate(satData.SatRec, date);
-                const positionEci = positionAndVelocity.position;
-                return eciToCartesian3(positionEci, date);
+                const {position} = satellite.propagate(satData.SatRec, date);
+                return eciToCartesian3(position, date);
             } catch (error) {
-                return null; // Skip rendering if error
+                return null;
             }
         }, false),
         point: {
@@ -53,32 +125,35 @@ function createSatelliteEntity(satGroup, satData) {
         },
         label: {
             text: satData.Name,
-            font: '10px sans-serif',
+            font: "10px sans-serif",
             fillColor: Cesium.Color.WHITE,
             style: Cesium.LabelStyle.FILL_AND_OUTLINE,
             outlineWidth: 2,
             verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
             pixelOffset: new Cesium.Cartesian2(0, -10),
             show: new Cesium.CallbackProperty(() => {
-                const cameraHeight = ctx.view3D.camera.positionCartographic.height; // Camera height in meters
-                // Show label if the camera height is below 10,000,000 meters OR the satellite is above 100,000 meters
-                return cameraHeight < 1e7;
+                const cameraHeight = ctx.view3D.camera.positionCartographic.height;
+                return cameraHeight < 1e7; // Show labels only at closer zoom levels
             }, false),
         },
-        path: {
-            resolution: 120,
-            material: new Cesium.PolylineGlowMaterialProperty({
-                glowPower: 0.1,
-                color: Cesium.Color.CYAN,
-            }),
-            width: 2,
-        },
+        // Store satData in the entity's properties for later retrieval
+        properties: {
+            satData: new Cesium.ConstantProperty(satData)
+        }
     };
 }
 
 function eciToCartesian3(positionEci, date) {
+    if (!positionEci) {
+        return null;
+    }
+
     const gmst = satellite.gstime(date);
     const geodetic = satellite.eciToGeodetic(positionEci, gmst);
 
-    return Cesium.Cartesian3.fromRadians(geodetic.longitude, geodetic.latitude, geodetic.height * 1000);
+    return Cesium.Cartesian3.fromRadians(
+        geodetic.longitude,
+        geodetic.latitude,
+        geodetic.height * 1000
+    );
 }

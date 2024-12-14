@@ -20,6 +20,7 @@ function getDB() {
 
 // Utility to check if cache is still valid
 export async function isCacheValid(cacheKey) {
+    if (cacheKey === undefined) return false;
     const db = await getDB();
     return new Promise((resolve) => {
         const request = db.get(cacheKey);
@@ -33,6 +34,7 @@ export async function isCacheValid(cacheKey) {
 
 // Save data to cache
 export async function saveToCache(cacheKey, data, duration = ctx.CACHE_DURATION) {
+    if (cacheKey === undefined) return false;
     const db = await getDB();
     const expiry = new Date().getTime() + duration;
     return new Promise((resolve, reject) => {

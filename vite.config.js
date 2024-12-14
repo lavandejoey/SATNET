@@ -16,7 +16,7 @@ export default defineConfig({
     },
     plugins: [cesium()],
     optimizeDeps: {
-        include: ['cesium', 'd3'],
+        include: ['cesium'],
     },
     publicDir: 'public',
 });

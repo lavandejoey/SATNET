@@ -14,6 +14,8 @@ export const ctx = {
     // Satellite data configurations
     CACHE_DURATION: 2 * 24 * 60 * 60 * 1000, // 2 days in milliseconds
 
+    currentOrbitEntity: null, // Current orbit entity
+
     LAUNCHLOG: {
         NAME: "LaunchLog",
         CACHE_KEY: "launchlog_cache",
@@ -22,23 +24,63 @@ export const ctx = {
     },
 
     SAT_GROUP: {
+        /****************************************** Communication Satellites ******************************************/
         STARLINK: {
             NAME: "Starlink",
+            CATEGORY: "Communications",
             COLOR: Cesium.Color.ORANGERED,
             CACHE_KEY: "starlink_tle_cache",
-            URL: "/data/starlinkTLE.txt", // Configurable via environment if needed
+            URL: "/data/tle/StarlinkTLE.txt", // Configurable via environment if needed
             DATA: null, // To be populated with Starlink TLE data
+            ENTITY: [],
             SELECTED: true,
         },
+        /******************************************* Navigation Satellites *******************************************/
         BEIDOU: {
-            NAME: "BEIDOU",
+            NAME: "Beidou",
+            CATEGORY: "Navigation",
             COLOR: Cesium.Color.YELLOWGREEN,
-            CACHE_KEY: "beidou_tle_cache",
+            CACHE_KEY: "BEIDOU_tle_cache",
             // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=beidou&FORMAT=tle",
-            URL: "/data/beidouTLE.txt",
+            URL: "/data/tle/beidouTLE.txt",
             DATA: null, // To be populated with BEIDOU TLE data
+            ENTITY: [],
             SELECTED: true,
         },
+        NOAA: {
+            NAME: "NOAA",
+            CATEGORY: "Weather",
+            COLOR: Cesium.Color.CYAN,
+            CACHE_KEY: "NOAA_tle_cache",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=noaa&FORMAT=tle",
+            URL: "/data/tle/NOAATLE.txt",
+            DATA: null,
+            ENTITY: [],
+            SELECTED: true,
+        },
+        /********************************************* Weather Satellites *********************************************/
+        GALILEO: {
+            NAME: "Galileo",
+            CATEGORY: "Navigation",
+            COLOR: Cesium.Color.BLUE,
+            CACHE_KEY: "galileo_tle_cache",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=galileo&FORMAT=tle",
+            URL: "/data/tle/GalileoTLE.txt",
+            DATA: null,
+            ENTITY: [],
+            SELECTED: true,
+        },
+        /******************************************** Scientific Satellites ********************************************/
+        GEODETIC: {
+            NAME: "Geodetic",
+            CATEGORY: "Scientific",
+            COLOR: Cesium.Color.PURPLE,
+            // CACHE_KEY: "geodetic_tle_cache",
+            URL: "/data/tle/GeodeticTLE.txt",
+            DATA: null,
+            ENTITY: [],
+            SELECTED: true,
+        }
     },
 };
 
@@ -47,9 +89,10 @@ export const CESIUM_ACCESS_TOKEN = import.meta.env.VITE_ION_TOKEN || 'YOUR_DEFAU
 
 // Shared Cesium clock instance
 export const CESIUM_SHARE_CLOCK = new Cesium.Clock({
-    startTime: Cesium.JulianDate.fromIso8601("2019-11-10"),
-    // Current system time as stop time
-    stopTime: Cesium.JulianDate.now(),
+    // startTime: Cesium.JulianDate.fromIso8601("1960-01-01T00:00:00Z"), // Start time
+    startTime: Cesium.JulianDate.fromIso8601("2010-01-01T00:00:00Z"), // Start time
+    currentTime: Cesium.JulianDate.fromIso8601(new Date().toISOString()),
+    stopTime: Cesium.JulianDate.fromIso8601(new Date(new Date().getFullYear() + 5, 0, 1).toISOString()),
     clockRange: Cesium.ClockRange.LOOP_STOP, // Loop at the end
     clockStep: Cesium.ClockStep.SYSTEM_CLOCK_MULTIPLIER,
     multiplier: 10, // Time multiplier for clock

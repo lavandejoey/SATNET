@@ -6,14 +6,30 @@ import {addWidgets} from "/js/components/widgets";
 import {displaySatellites} from "/js/components/GlobeSatellites";
 import {createStatViz} from "/js/components/StatMap";
 import {loadLaunchLog} from "/js/utils/data";
+import {ctx} from "/js/utils/config";
+
+async function loadingPage() {
+    // Once both are loaded and we have ctx.view3D and ctx.view2D not null, hide the loading overlay
+    while (ctx.view2D === null || ctx.view3D === null) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    // Delay to hide the loading overlay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.classList.add('hidden');
+    }
+}
 
 async function loadViz() {
+    // Loading page
+    loadingPage().then(() => console.log('Loading page'));
+
     /********************************************* Viewer Initialization *********************************************/
-    // Load the 3D and 2D viewers
     GlobeViewer().then(() => console.log('GlobeViewer loaded, '));
     MapViewer().then(() => console.log('MapViewer loaded'));
 
-    // Remove the watermark
+    // Add widgets
     addWidgets().then(() => console.log('Widgets loaded'));
 
     /********************************************** Data Initialization **********************************************/
