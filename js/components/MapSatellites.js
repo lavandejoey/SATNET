@@ -1,51 +1,82 @@
-// js/components/MapSatellitePoints.js
+// /js/components/MapSatellitePoints.js
 import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
 
 export function display2DSatellites() {
     try {
-        // Remove existing entities to ensure a clean slate
         ctx.view2D.entities.removeAll();
+        const launchDatas = ctx.LAUNCHLOG.DATA;
+        const lifespan = 2000;
+        ctx.view3D.clock.onTick.addEventListener(() => {
+            // Load the satellite
+            const currentTime = Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime);
+            launchDatas.forEach((launchData) => {
+                const launchDate = launchData.Launch_Date; // lanch time
+                const loc = launchData.loc; // longtitude and lattitude
 
-        // Add event listener only once to avoid duplication
-        if (!ctx.view3D.clock.onTick._listeners.includes(handleTick)) {
-            ctx.view3D.clock.onTick.addEventListener(handleTick);
-        }
-
-        function handleTick() {
-            const currentTime = Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime); // Current time
-
-            ctx.LAUNCHLOG.DATA.forEach((launchData) => {
-                const { Launch_Date: launchDate, loc } = launchData;
-
-                if (currentTime.toDateString() === new Date(launchDate).toDateString()) {
-                    const launchEntity = createSatelliteEntity(loc);
-
-                    if (launchEntity) {
-                        const entityId = ctx.view2D.entities.add(launchEntity);
-
-                        // Automatically remove the entity after 1 second
-                        setTimeout(() => ctx.view2D.entities.remove(entityId), 1000);
+                if (currentTime.toDateString() === launchDate.toDateString()) {
+                    const launchRadiusEntity = createSatelliteRadiusEntity(loc, launchDate, lifespan);
+                    // const launchEntity = createSatelliteEntity(loc);
+                    // 5seconds remove the point
+                    if (launchRadiusEntity) {
+                        var entity_id = ctx.view2D.entities.add(launchRadiusEntity);
                     }
+                    // if (launchEntity){
+                    //     var entity2_id = ctx.view2D.entities.add(launchEntity);
+                    // }
+                    setTimeout(() => {
+                        // if (entity2_id){
+                        //     ctx.view2D.entities.remove(entity2_id);
+                        // }
+                        if (entity_id) {
+                            ctx.view2D.entities.remove(entity_id);
+                        }
+                    }, lifespan);
                 }
             });
-        }
+        });
     } catch (error) {
         console.error("Error initializing satellites:", error);
     }
 }
 
-function createSatelliteEntity(loc) {
-    if (!loc || typeof loc.Longitude !== "number" || typeof loc.Latitude !== "number") {
-        console.warn("Invalid location data:", loc);
-        return null;
-    }
+// function createSatelliteEntity(loc){
+//     const startRadius = 5.0;
+//     return {
+//         position: Cesium.Cartesian3.fromDegrees(loc.Longitude, loc.Latitude),
+//         point: {
+//             pixelSize: startRadius,
+//             color: Cesium.Color.RED,
+//             outlineColor: Cesium.Color.RED,
+//             outlineWidth: 0,
+//         },
+//     }
+// }
 
+function createSatelliteRadiusEntity(loc, launchDate, lifespan) {
+    const startRadius = 5.0;
+    const maxRadius = 60.0;
+    const startAlpha = 0.1;
+    const startTime = new Date();
     return {
         position: Cesium.Cartesian3.fromDegrees(loc.Longitude, loc.Latitude),
         point: {
-            pixelSize: 5,
-            color: new Cesium.CallbackProperty(() => Cesium.Color.RED.withAlpha(1), false),
+            pixelSize: new Cesium.CallbackProperty((time) => {
+                const elapsed = (new Date() - startTime);
+                const progress = elapsed / lifespan;
+
+                if (progress >= 1) return 0;
+                if (progress <= 0.0) return startRadius;
+                return startRadius + progress * (maxRadius - startRadius);
+            }, false),
+            color: new Cesium.CallbackProperty((time) => {
+                const elapsed = (new Date() - startTime);
+                const progress = elapsed / lifespan;
+                if (progress >= 1.0) return Cesium.Color.RED.withAlpha(0);
+                if (progress <= 0.0) return Cesium.Color.RED.withAlpha(1);
+                // return Cesium.Color.RED.withAlpha(0.1);
+                return Cesium.Color.RED.withAlpha(startAlpha * (1.0 - progress));
+            }, false),
         },
     };
 }

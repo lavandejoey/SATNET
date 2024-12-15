@@ -99,7 +99,8 @@ export const CESIUM_ACCESS_TOKEN = import.meta.env.VITE_ION_TOKEN || 'YOUR_DEFAU
 export const CESIUM_SHARE_CLOCK = new Cesium.Clock({
     // startTime: Cesium.JulianDate.fromIso8601("1960-01-01T00:00:00Z"), // Start time
     startTime: Cesium.JulianDate.fromIso8601("2010-01-01T00:00:00Z"), // Start time
-    currentTime: Cesium.JulianDate.fromIso8601(new Date().toISOString()),
+    currentTime: Cesium.JulianDate.fromIso8601("2011-11-01T00:00:00Z"), // Start time
+    // currentTime: Cesium.JulianDate.fromIso8601(new Date().toISOString()),
     stopTime: Cesium.JulianDate.fromIso8601(new Date(new Date().getFullYear() + 5, 0, 1).toISOString()),
     clockRange: Cesium.ClockRange.LOOP_STOP, // Loop at the end
     clockStep: Cesium.ClockStep.SYSTEM_CLOCK_MULTIPLIER,
