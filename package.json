@@ -13,10 +13,10 @@
   "description": "- 3D satellite plotting (Current)   - Highlight specific satellite (by click): highlight its detailed information.",
   "main": "index.js",
   "scripts": {
-    "start": "vite",
-    "dev": "vite",
+    "start": "vite --port 4170",
+    "dev": "vite --debug",
     "build": "vite build",
-    "serve": "vite preview",
+    "serve": "vite preview --port 4170",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
