@@ -2,7 +2,7 @@
 import {ctx} from "/js/utils/config";
 
 // IndexedDB Utility
-const dbPromise = indexedDB.open("cacheDatabase", 1);
+export const dbPromise = indexedDB.open("cacheDatabase", 1);
 
 dbPromise.onupgradeneeded = function (event) {
     const db = event.target.result;
@@ -11,7 +11,7 @@ dbPromise.onupgradeneeded = function (event) {
     }
 };
 
-function getDB() {
+export function getDB() {
     return new Promise((resolve, reject) => {
         const request = dbPromise.result.transaction("cache", "readwrite").objectStore("cache");
         resolve(request);

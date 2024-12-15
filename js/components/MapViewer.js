@@ -9,8 +9,8 @@ Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 
 export async function MapViewer() {
     // set up the basic Cesium viewer
-    ctx.view2D = new Cesium.Viewer('cesiumContainer2D', CESIUM_2D_CONFIG);
-    ctx.view2D.scene.globe.enableLighting = true;
+    const view2D = new Cesium.Viewer('cesiumContainer2D', CESIUM_2D_CONFIG);
+    view2D.scene.globe.enableLighting = true;
 
     // Home button -> initCamera function
     // ctx.view2D.homeButton.viewModel.command.beforeExecute.addEventListener(function (e) {
@@ -19,14 +19,16 @@ export async function MapViewer() {
     // });
 
     // 2D view is all follows 3D -> disable all 2D camera active move
-    disable2DCameraControls(ctx.view2D);
+    disable2DCameraControls(view2D);
 
     // no-need separate camera
     // initCamera(view2D, INITIAL_CAMERA_2D);
-    ctx.canvasHeight = ctx.view2D.canvas.clientHeight;
+    ctx.canvasHeight = view2D.canvas.clientHeight;
 
     // apply sync function
     ctx.view3D.camera.changed.addEventListener(sync2DView);
+
+    ctx.view2D = view2D; // signal that the viewer is ready
 }
 
 function disable2DCameraControls(viewer) {
