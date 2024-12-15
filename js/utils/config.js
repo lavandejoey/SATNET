@@ -14,12 +14,20 @@ export const ctx = {
     // Satellite data configurations
     CACHE_DURATION: 2 * 24 * 60 * 60 * 1000, // 2 days in milliseconds
 
+    currentSatelliteEntity: null, // Current satellite entity
     currentOrbitEntity: null, // Current orbit entity
 
     LAUNCHLOG: {
         NAME: "LaunchLog",
         CACHE_KEY: "launchlog_cache",
         URL: "/data/launchlog.tsv", // Configurable via environment if needed
+        DATA: null, // To be populated with launch log data
+    },
+
+    SITES: {
+        NAME: "Site",
+        CACHE_KEY: "site_cache",
+        URL: "/data/sites.tsv", // Configurable via environment if needed
         DATA: null, // To be populated with launch log data
     },
 
@@ -81,13 +89,6 @@ export const ctx = {
             ENTITY: [],
             SELECTED: true,
         }
-    },
-
-    SITES:{
-        NAME: "Site",
-        CACHE_KEY: "site_cache",
-        URL: "/data/sites.tsv", // Configurable via environment if needed
-        DATA: null, // To be populated with launch log data
     },
 };
 

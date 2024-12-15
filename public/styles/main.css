@@ -116,12 +116,11 @@ body, html, #app {
 }
 
 .cesium-selection-wrapper {
-    border: 2px dashed red !important; /* Change the border color and style */
-    border-radius: 50%; /* Make it circular */
-    box-shadow: 0 0 5px 5px rgba(255, 0, 0, 0.5); /* Add a shadow */
+    border: 2px dashed whitesmoke !important; /* Change the border color and style */
+    box-shadow: 0 0 2px 2px rgb(245, 245, 245); /* Add a shadow */
     position: absolute;
-    width: 50px !important;
-    height: 50px !important;
+    width: 10px !important;
+    height: 10px !important;
     pointer-events: none;
     visibility: hidden;
     opacity: 0;

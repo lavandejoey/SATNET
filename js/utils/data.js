@@ -7,6 +7,7 @@ import * as satellite from "satellite.js";
 // Keep col: #Launch_Tag, Launch_Date, Piece, Name, PLName, SatOwner, SatState, Launch_Site
 const REQUIRED_COLUMNS = ["#Launch_Tag", "Launch_Date", "Piece", "Name", "PLName", "SatOwner", "SatState", "Launch_Site"];
 const SITE_REQUIRED_COLUMNS = ["#Site", "Longitude", "Latitude"];
+
 function parseStringDate(rawDatetime) {
     rawDatetime = rawDatetime.replaceAll('?', '').slice(0, 16);
 
@@ -33,15 +34,14 @@ function cleanDataColumns(data, columns) {
             return cleanedRow;
         });
 }
+
 export async function loadSites() {
-    
     if (await isCacheValid(ctx.SITES.CACHE_KEY)) {
-        const cachedData = await getCachedData(ctx.SITES.CACHE_KEY);
-        ctx.SITES.DATA = cachedData;
+        ctx.SITES.DATA = await getCachedData(ctx.SITES.CACHE_KEY);
         console.log("Fetched sites data from cache");
-        return;
+        return ctx.SITES.DATA;
     }
-    
+
     try {
         const data = await d3.dsv('\t', ctx.SITES.URL);
         const parsedData = data.map(row => ({
@@ -50,22 +50,25 @@ export async function loadSites() {
         const cleanedData = cleanDataColumns(parsedData, SITE_REQUIRED_COLUMNS);
 
         ctx.SITES.DATA = cleanedData.reduce((acc, site) => {
-            const siteKey = site["#Site"].trim(); 
-            const longitude = parseFloat(site["Longitude"]); 
-            const latitude = parseFloat(site["Latitude"]); 
-        
-            acc[siteKey] = { Longitude: longitude, Latitude: latitude };
+            const siteKey = site["#Site"].trim();
+            const longitude = parseFloat(site["Longitude"]);
+            const latitude = parseFloat(site["Latitude"]);
+
+            acc[siteKey] = {Longitude: longitude, Latitude: latitude};
             return acc;
         }, {});
 
         console.log("Fetched sites data from server");
 
         saveToCache(ctx.SITES.CACHE_KEY, ctx.SITES.DATA, ctx.CACHE_DURATION).then(() => console.log("Saved launch log data to cache"));
+
+        return ctx.SITES.DATA;
     } catch (error) {
         console.error("Failed to fetch sites data", error);
         ctx.SITES.DATA = [];
     }
 }
+
 export async function loadLaunchLog() {
     if (await isCacheValid(ctx.LAUNCHLOG.CACHE_KEY)) {
         const cachedData = await getCachedData(ctx.LAUNCHLOG.CACHE_KEY);
@@ -89,6 +92,17 @@ export async function loadLaunchLog() {
 
         const cleanedData = cleanDataColumns(parsedData, REQUIRED_COLUMNS);
         ctx.LAUNCHLOG.DATA = cleanedData;
+        console.log("Fetched launch log data from server");
+
+        // Load sites data and match with location
+        const siteData = await loadSites();
+        cleanedData.forEach(launch => {
+            const launchSite = launch.Launch_Site;
+            const map_loc = siteData[launchSite];
+            if (map_loc) launch['loc'] = map_loc;
+            else console.log(launchSite);
+        });
+
         console.log("Fetched launch log data from server");
 
         saveToCache(ctx.LAUNCHLOG.CACHE_KEY, cleanedData, ctx.CACHE_DURATION).then(() => console.log("Saved launch log data to cache"));

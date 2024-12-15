@@ -5,27 +5,34 @@ import {ctx} from "/js/utils/config";
 import {loadOrbitsTLEDate} from "/js/utils/data";
 
 export function handleSatelliteClick(viewer) {
+    function clearSelection() {
+        if (ctx.currentSatelliteEntity) {
+            ctx.currentSatelliteEntity.label.show = false;
+            ctx.currentSatelliteEntity = null;
+        }
+
+        if (ctx.currentOrbitEntity) {
+            viewer.entities.remove(ctx.currentOrbitEntity);
+            ctx.currentOrbitEntity = null;
+        }
+    }
+
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 
     handler.setInputAction(async click => {
         const pickedObject = viewer.scene.pick(click.position);
         if (Cesium.defined(pickedObject) && pickedObject.id) {
             const satelliteEntity = pickedObject.id;
+            ctx.currentSatelliteEntity = satelliteEntity;
 
             // Show its label
             if (satelliteEntity.label) {
                 satelliteEntity.label.show = true;
-            }
 
-            // Remove the previously drawn orbit if it exists
-            if (ctx.currentOrbitEntity) {
-                viewer.entities.remove(ctx.currentOrbitEntity);
-                ctx.currentOrbitEntity = null;
             }
-
             // Retrieve the satellite's TLE/propagation data from its properties
-            const satData = satelliteEntity.properties?.satData?.getValue();
 
+            const satData = satelliteEntity.properties?.satData?.getValue();
             if (satData && satData.SatRec) {
                 // Generate orbit positions for a certain time span, for example 1 day
                 const orbitPositions = [];
@@ -59,19 +66,20 @@ export function handleSatelliteClick(viewer) {
                 });
             }
 
-            console.log("Satellite clicked:", {
-                name: satelliteEntity.name,
-                position: satelliteEntity.position?.getValue(Cesium.JulianDate.now()),
-                label: satelliteEntity.label?.text,
-            });
+            // console.log("Satellite clicked:", {
+            //     name: satelliteEntity.name,
+            //     position: satelliteEntity.position?.getValue(Cesium.JulianDate.now()),
+            //     label: satelliteEntity.label?.text,
+            // });
+        } else {
+            clearSelection();
         }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
 
 export function displaySatellites() {
     try {
-        const currentEntities = ctx.view3D.entities;
-        currentEntities.removeAll();
+        ctx.view3D.entities.removeAll();
 
         // Iterate over all satellite groups
         Object.entries(ctx.SAT_GROUP).forEach(([groupName, satGroup]) => {
@@ -88,7 +96,7 @@ export function displaySatellites() {
                     satGroup.DATA.forEach(satData => {
                         const satelliteEntity = createSatelliteEntity(satGroup, satData);
                         if (satelliteEntity) {
-                            currentEntities.add(satelliteEntity);
+                            ctx.view3D.entities.add(satelliteEntity);
                             satGroup.ENTITY.push(satelliteEntity.name);
                         }
                     });

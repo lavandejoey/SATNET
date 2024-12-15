@@ -24,7 +24,7 @@ async function loadingPage() {
 
 async function loadViz() {
     // Loading page
-    loadingPage().then(() => console.log('Loading page'));
+    loadingPage().then(() => console.log("Page loaded"));
 
     /********************************************* Viewer Initialization *********************************************/
     // Load the 3D and 2D viewers
