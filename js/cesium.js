@@ -28,8 +28,13 @@ async function loadViz() {
 
     /********************************************* Viewer Initialization *********************************************/
     // Load the 3D and 2D viewers
-    GlobeViewer().then(() => console.log('GlobeViewer loaded, '));
+    GlobeViewer().then(() => console.log('GlobeViewer loaded'));
     MapViewer().then(() => console.log('MapViewer loaded'));
+
+    // wait for the viewers to load
+    // while (ctx.view2D === null || ctx.view3D === null) {
+    //     await new Promise(resolve => setTimeout(resolve, 100));
+    // }
 
     // Add widgets
     addWidgets().then(() => console.log('Widgets loaded'));

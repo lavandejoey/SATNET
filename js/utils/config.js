@@ -23,13 +23,19 @@ export const ctx = {
         URL: "/data/launchlog.tsv", // Configurable via environment if needed
         DATA: null, // To be populated with launch log data
     },
-
+    COUNTRY:{
+        NAME:"Country",
+        CACHE_KEY: "country_cache",
+        URL: "/data/country.tsv",
+        DATA: null,
+    },
     SITES: {
         NAME: "Site",
         CACHE_KEY: "site_cache",
         URL: "/data/sites.tsv", // Configurable via environment if needed
         DATA: null, // To be populated with launch log data
     },
+    NUM_SC: null,
 
     SAT_GROUP: {
         /****************************************** Communication Satellites ******************************************/

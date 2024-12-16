@@ -10,6 +10,9 @@ Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 export async function MapViewer() {
     // set up the basic Cesium viewer
     const view2D = new Cesium.Viewer('cesiumContainer2D', CESIUM_2D_CONFIG);
+
+    // await view2D.imageryLayers.addImageryProvider(ionImageryProvider);
+
     view2D.scene.globe.enableLighting = true;
 
     // Home button -> initCamera function

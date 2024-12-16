@@ -11,6 +11,8 @@ export async function GlobeViewer() {
     // Set up the basic Cesium viewer
     const view3D = new Cesium.Viewer('cesiumContainer3D', CESIUM_3D_CONFIG);
 
+    // await view3D.imageryLayers.addImageryProvider(ionImageryProvider);
+
     view3D.scene.globe.enableLighting = true;
 
     // sync sensitivity
@@ -18,7 +20,7 @@ export async function GlobeViewer() {
 
     initCamera(view3D, INITIAL_CAMERA_3D);
 
-    handleSatelliteClick(view3D);
-
     ctx.view3D = view3D; // signal that the viewer is ready
+
+    handleSatelliteClick();
 }
