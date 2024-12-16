@@ -4,10 +4,11 @@ import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
 import {loadOrbitsTLEDate} from "/js/utils/data";
 
-export function handleSatelliteClick(viewer) {
+export function handleSatelliteClick() {
     function clearSelection() {
         if (ctx.currentSatelliteEntity) {
             ctx.currentSatelliteEntity.label.show = false;
+            ctx.currentSatelliteEntity.outlineColor = undefined;
             ctx.currentSatelliteEntity = null;
         }
 
@@ -17,50 +18,30 @@ export function handleSatelliteClick(viewer) {
         }
     }
 
-    function modifySelectionIndicator() {
-        // Access the selection indicator's SVG path element
-        const selectionIndicatorPath = document.querySelector('.cesium-selection-wrapper svg path');
-
-        // Check if the element exists before modifying
-        if (selectionIndicatorPath) {
-            // Modify the SVG path's attributes
-            selectionIndicatorPath.setAttribute('d', 'M -10 -10 L 10 -10 L 10 10 L -10 10 Z'); // Example path data
-            selectionIndicatorPath.setAttribute('stroke-dasharray', '10, 5');
-        } else {
-            console.warn('Selection indicator SVG path not found.');
-        }
-    }
-
     const handler = new Cesium.ScreenSpaceEventHandler(ctx.view3D.scene.canvas);
 
     handler.setInputAction(async click => {
         const pickedObject = ctx.view3D.scene.pick(click.position);
         clearSelection();
-        modifySelectionIndicator();
         if (Cesium.defined(pickedObject) && pickedObject.id) {
             const satelliteEntity = pickedObject.id;
             ctx.currentSatelliteEntity = satelliteEntity;
+            ctx.currentSatelliteEntity.label.show = true;
+            ctx.currentSatelliteEntity.outlineColor = Cesium.Color.WHITE;
 
-            // Show its label
-            if (satelliteEntity.label) {
-                satelliteEntity.label.show = true;
-
-            }
-            // Retrieve the satellite's TLE/propagation data from its properties
-
+            // Retrieve the satellite's TLE/propagation data
             const satData = satelliteEntity.properties?.satData?.getValue();
             if (satData && satData.SatRec) {
-                // Generate orbit positions for a certain time span, for example 1 day
+                const startTime = ctx.view3D.clock.currentTime;
                 const orbitPositions = [];
-                const startTime = Cesium.JulianDate.now();
-                const interval = 10;
-                // Sample orbit every 10 minutes for 24 hours: 24h * 60min / 10min = 144 points
-                for (let minutes = 0; minutes < 1440 + interval; minutes += interval) {
+                const interval = 5; // minutes
+                // Generate orbit positions for 24 hours at 5-minute intervals
+                for (let minutes = 0; minutes < 1440; minutes += interval) {
                     const time = Cesium.JulianDate.addMinutes(startTime, minutes, new Cesium.JulianDate());
                     const date = Cesium.JulianDate.toDate(time);
 
                     try {
-                        const {position} = satellite.propagate(satData.SatRec, date);
+                        const { position } = satellite.propagate(satData.SatRec, date);
                         const cartesian = eciToCartesian3(position, date);
                         if (cartesian) {
                             orbitPositions.push(cartesian);
@@ -76,7 +57,7 @@ export function handleSatelliteClick(viewer) {
                     polyline: {
                         positions: orbitPositions,
                         width: 2,
-                        material: Cesium.Color.YELLOW,
+                        material: Cesium.Color.WHITESMOKE.withAlpha(0.8),
                         clampToGround: false
                     }
                 });
