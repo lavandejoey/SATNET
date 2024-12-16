@@ -115,7 +115,13 @@ body, html, #app {
 }
 
 .cesium-selection-wrapper svg {
-    fill: none !important;
+    fill: #fff !important;
     stroke: #fff !important;
-    stroke-width: 2px !important;
+    stroke-width: 3px !important;
+    z-index: -1 !important;
+}
+
+.cesium-selection-wrapper svg path {
+    transform: scale(0.2) !important;
+    z-index: -1 !important;
 }
