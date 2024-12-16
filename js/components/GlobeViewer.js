@@ -11,7 +11,7 @@ export async function GlobeViewer() {
     // Set up the basic Cesium viewer
     const view3D = new Cesium.Viewer('cesiumContainer3D', CESIUM_3D_CONFIG);
 
-    await view3D.imageryLayers.addImageryProvider(ionImageryProvider);
+    // await view3D.imageryLayers.addImageryProvider(ionImageryProvider);
 
     view3D.scene.globe.enableLighting = true;
 

@@ -127,7 +127,7 @@ export const ionImageryProvider = await Cesium.IonImageryProvider.fromAssetId(39
 // Common Cesium configuration
 const CESIUM_SHARE_CONFIG = {
     // imageryProvider: ion,
-    imageryProvider: ionImageryProvider,
+    // imageryProvider: ionImageryProvider,
     baseLayerPicker: false,
     infoBox: false,
     navigationHelpButton: false,
