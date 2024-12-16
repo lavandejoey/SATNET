@@ -10,16 +10,36 @@
   },
   "name": "starlink-mapper",
   "version": "1.0.0",
-  "description": "- 3D satellite plotting (Current)   - Highlight specific satellite (by click): highlight its detailed information.",
-  "main": "index.js",
+  "description": "- 3D satellite plotting (Current) - Highlight specific satellite (by click): highlight its detailed information.",
   "scripts": {
     "start": "vite --port 4170",
-    "dev": "vite --debug",
+    "dev": "vite --debug --port 4170",
     "build": "vite build",
     "serve": "vite preview --port 4170",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "contributors": [
+    {
+      "name": "Ziyi LIU",
+      "email": "ziyi.ipparis@outlook.com",
+      "url": "https://www.ziyiliu.top/",
+      "organization": "Institut Polytechnique de Paris"
+    },
+    {
+      "name": "Yixing YANG",
+      "email": "vivianyang036@gmail.com",
+      "organization": "Institut Polytechnique de Paris"
+    },
+    {
+      "name": "Ling LIU",
+      "email": "lingada60@gmail.com",
+      "organization": "Institut Polytechnique de Paris"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lavandejoey/starlink-mapper.git"
+  }
 }
