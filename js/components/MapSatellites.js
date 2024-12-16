@@ -49,7 +49,8 @@ function createSatelliteRadiusEntity(loc, launchDate, lifespan) {
                 if (progress <= 0.0) return startRadius;
                 return startRadius + progress * (maxRadius - startRadius);
             }, false),
-            color: new Cesium.CallbackProperty((time) => {
+            color: Cesium.Color.TRANSPARENT,
+            outlineColor: new Cesium.CallbackProperty((time) => {
                 const elapsed = (new Date() - startTime);
                 const progress = elapsed / lifespan;
                 if (progress >= 1.0) return Cesium.Color.RED.withAlpha(0);
