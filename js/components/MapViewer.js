@@ -1,7 +1,7 @@
 // js/viewer2dManage.js
 import * as Cesium from "cesium";
 import "/node_modules/cesium/Build/Cesium/Widgets/widgets.css";
-import {CESIUM_2D_CONFIG, CESIUM_ACCESS_TOKEN, ctx, ionImageryProvider} from "/js/utils/config";
+import {CESIUM_2D_CONFIG, CESIUM_ACCESS_TOKEN, ctx} from "/js/utils/config";
 import {initCamera, INITIAL_CAMERA_3D} from "/js/utils/camera";
 import {CAMERA_MAX_ALTITUDE, CAMERA_MIN_ALTITUDE, DEGREE_TO_METER, POLE_DISTANCE_METERS} from "/js/utils/constants";
 

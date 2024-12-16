@@ -114,21 +114,11 @@ export const CESIUM_SHARE_CLOCK = new Cesium.Clock({
     shouldAnimate: true // Animation enabled by default
 });
 
-const osm = new Cesium.OpenStreetMapImageryProvider({
-    url: "https://tile.openstreetmap.org/",
-    fileExtension: "png",
-    maximumLevel: 18,
-    credit: "OpenStreetMap contributors"
-});
-
-// Cesium.ImageryLayer.fromProviderAsync(Cesium.IonImageryProvider.fromAssetId(3954));
-export const ionImageryProvider = await Cesium.IonImageryProvider.fromAssetId(3954);
-
 // Common Cesium configuration
 const CESIUM_SHARE_CONFIG = {
-    // imageryProvider: ion,
-    // imageryProvider: ionImageryProvider,
+    imageryProvider: undefined, // Can be set to a default imagery provider
     baseLayerPicker: false,
+    terrain: undefined, // Can be set to a default terrain provider
     infoBox: false,
     navigationHelpButton: false,
     helpButton: false,

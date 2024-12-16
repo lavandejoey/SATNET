@@ -4,12 +4,13 @@ import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
 import {loadOrbitsTLEDate} from "/js/utils/data";
 
-export function handleSatelliteClick() {
+export function handleSatelliteClick(viewer) {
     function clearSelection() {
         if (ctx.currentSatelliteEntity) {
             ctx.currentSatelliteEntity.label.show = false;
             ctx.currentSatelliteEntity = null;
         }
+
         if (ctx.currentOrbitEntity) {
             ctx.view3D.entities.remove(ctx.currentOrbitEntity);
             ctx.currentOrbitEntity = null;
