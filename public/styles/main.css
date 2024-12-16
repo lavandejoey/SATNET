@@ -71,7 +71,6 @@ body, html, #app {
 
 #cesiumContainerTimeline {
     left: 136px;
-    /*height: 30;*/
     flex: 1; /* Use remaining width */
     top: -30px;
 }
@@ -83,7 +82,7 @@ body, html, #app {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.95);
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -93,8 +92,8 @@ body, html, #app {
 }
 
 #loadingOverlay.hidden {
-    opacity: 0; /* Fully transparent */
-    visibility: hidden; /* Hidden state */
+    opacity: 0;
+    visibility: hidden;
 }
 
 .spinner {
@@ -115,26 +114,8 @@ body, html, #app {
     }
 }
 
-.cesium-selection-wrapper {
-    border: 2px dashed whitesmoke !important; /* Change the border color and style */
-    box-shadow: 0 0 2px 2px rgb(245, 245, 245); /* Add a shadow */
-    position: absolute;
-    width: 10px !important;
-    height: 10px !important;
-    pointer-events: none;
-    visibility: hidden;
-    opacity: 0;
-    transition: visibility 0s 0.2s, opacity 0.2s ease-in;
-}
-
-.cesium-selection-wrapper-visible {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.2s ease-out;
-}
-
 .cesium-selection-wrapper svg {
     fill: none !important;
-    stroke: none !important;
-    stroke-width: 1.1px;
+    stroke: #fff !important;
+    stroke-width: 2px !important;
 }

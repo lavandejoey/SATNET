@@ -4,23 +4,38 @@ import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
 import {loadOrbitsTLEDate} from "/js/utils/data";
 
-export function handleSatelliteClick(viewer) {
+export function handleSatelliteClick() {
     function clearSelection() {
         if (ctx.currentSatelliteEntity) {
             ctx.currentSatelliteEntity.label.show = false;
             ctx.currentSatelliteEntity = null;
         }
-
         if (ctx.currentOrbitEntity) {
-            viewer.entities.remove(ctx.currentOrbitEntity);
+            ctx.view3D.entities.remove(ctx.currentOrbitEntity);
             ctx.currentOrbitEntity = null;
         }
     }
 
-    const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+    function modifySelectionIndicator() {
+        // Access the selection indicator's SVG path element
+        const selectionIndicatorPath = document.querySelector('.cesium-selection-wrapper svg path');
+
+        // Check if the element exists before modifying
+        if (selectionIndicatorPath) {
+            // Modify the SVG path's attributes
+            selectionIndicatorPath.setAttribute('d', 'M -10 -10 L 10 -10 L 10 10 L -10 10 Z'); // Example path data
+            selectionIndicatorPath.setAttribute('stroke-dasharray', '10, 5');
+        } else {
+            console.warn('Selection indicator SVG path not found.');
+        }
+    }
+
+    const handler = new Cesium.ScreenSpaceEventHandler(ctx.view3D.scene.canvas);
 
     handler.setInputAction(async click => {
-        const pickedObject = viewer.scene.pick(click.position);
+        const pickedObject = ctx.view3D.scene.pick(click.position);
+        clearSelection();
+        modifySelectionIndicator();
         if (Cesium.defined(pickedObject) && pickedObject.id) {
             const satelliteEntity = pickedObject.id;
             ctx.currentSatelliteEntity = satelliteEntity;
@@ -37,7 +52,7 @@ export function handleSatelliteClick(viewer) {
                 // Generate orbit positions for a certain time span, for example 1 day
                 const orbitPositions = [];
                 const startTime = Cesium.JulianDate.now();
-                const interval = 30;
+                const interval = 10;
                 // Sample orbit every 10 minutes for 24 hours: 24h * 60min / 10min = 144 points
                 for (let minutes = 0; minutes < 1440 + interval; minutes += interval) {
                     const time = Cesium.JulianDate.addMinutes(startTime, minutes, new Cesium.JulianDate());
@@ -55,7 +70,7 @@ export function handleSatelliteClick(viewer) {
                 }
 
                 // Create a polyline entity to visualize the orbit
-                ctx.currentOrbitEntity = viewer.entities.add({
+                ctx.currentOrbitEntity = ctx.view3D.entities.add({
                     name: `${satelliteEntity.name}-orbit`,
                     polyline: {
                         positions: orbitPositions,
@@ -65,14 +80,6 @@ export function handleSatelliteClick(viewer) {
                     }
                 });
             }
-
-            // console.log("Satellite clicked:", {
-            //     name: satelliteEntity.name,
-            //     position: satelliteEntity.position?.getValue(Cesium.JulianDate.now()),
-            //     label: satelliteEntity.label?.text,
-            // });
-        } else {
-            clearSelection();
         }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }

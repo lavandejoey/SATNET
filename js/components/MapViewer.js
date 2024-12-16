@@ -1,7 +1,7 @@
 // js/viewer2dManage.js
 import * as Cesium from "cesium";
 import "/node_modules/cesium/Build/Cesium/Widgets/widgets.css";
-import {CESIUM_2D_CONFIG, CESIUM_ACCESS_TOKEN, ctx} from "/js/utils/config";
+import {CESIUM_2D_CONFIG, CESIUM_ACCESS_TOKEN, ctx, ionImageryProvider} from "/js/utils/config";
 import {initCamera, INITIAL_CAMERA_3D} from "/js/utils/camera";
 import {CAMERA_MAX_ALTITUDE, CAMERA_MIN_ALTITUDE, DEGREE_TO_METER, POLE_DISTANCE_METERS} from "/js/utils/constants";
 
@@ -10,6 +10,9 @@ Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 export async function MapViewer() {
     // set up the basic Cesium viewer
     const view2D = new Cesium.Viewer('cesiumContainer2D', CESIUM_2D_CONFIG);
+
+    await view2D.imageryLayers.addImageryProvider(ionImageryProvider);
+
     view2D.scene.globe.enableLighting = true;
 
     // Home button -> initCamera function
