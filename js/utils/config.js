@@ -35,7 +35,7 @@ export const ctx = {
         URL: "/data/sites.tsv", // Configurable via environment if needed
         DATA: null, // To be populated with launch log data
     },
-
+    NUM_SC: null,
 
     SAT_GROUP: {
         /****************************************** Communication Satellites ******************************************/
