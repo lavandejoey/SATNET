@@ -69,6 +69,39 @@ export async function loadSites() {
     }
 }
 
+export async function loadCountry() {
+    if (await isCacheValid(ctx.COUNTRY.CACHE_KEY)) {
+        const cachedData = await getCachedData(ctx.COUNTRY.CACHE_KEY);
+        console.log("Fetched country data from cache");
+        return;
+    }
+    
+    try {
+        const data = await d3.dsv('\t', ctx.COUNTRY.URL);
+        const parsedData = data.map(row => ({
+            ...row
+        }));
+
+        ctx.COUNTRY.DATA = parsedData.reduce((acc, site) => {
+            const country = site["SatelliteState"].trim(); 
+            const longitude = parseFloat(site["Longitude"]); 
+            const latitude = parseFloat(site["Latitude"]); 
+        
+            acc[country] = { Longitude: longitude, Latitude: latitude };
+            return acc;
+        }, {});
+
+        console.log("Fetched country data from server");
+
+        saveToCache(ctx.COUNTRY.CACHE_KEY, ctx.COUNTRY.DATA, ctx.CACHE_DURATION).then(() => console.log("Saved launch log data to cache"));
+
+        return ctx.COUNTRY.DATA;
+    } catch (error) {
+        console.error("Failed to fetch country data", error);
+        ctx.COUNTRY.DATA = [];
+    }
+}
+
 export async function loadLaunchLog() {
     if (await isCacheValid(ctx.LAUNCHLOG.CACHE_KEY)) {
         const cachedData = await getCachedData(ctx.LAUNCHLOG.CACHE_KEY);

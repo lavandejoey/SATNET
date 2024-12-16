@@ -16,18 +16,11 @@ export function display2DSatellites() {
 
                 if (currentTime.toDateString() === launchDate.toDateString()) {
                     const launchRadiusEntity = createSatelliteRadiusEntity(loc, launchDate, lifespan);
-                    // const launchEntity = createSatelliteEntity(loc);
                     // 5seconds remove the point
                     if (launchRadiusEntity) {
                         var entity_id = ctx.view2D.entities.add(launchRadiusEntity);
                     }
-                    // if (launchEntity){
-                    //     var entity2_id = ctx.view2D.entities.add(launchEntity);
-                    // }
                     setTimeout(() => {
-                        // if (entity2_id){
-                        //     ctx.view2D.entities.remove(entity2_id);
-                        // }
                         if (entity_id) {
                             ctx.view2D.entities.remove(entity_id);
                         }
@@ -39,19 +32,6 @@ export function display2DSatellites() {
         console.error("Error initializing satellites:", error);
     }
 }
-
-// function createSatelliteEntity(loc){
-//     const startRadius = 5.0;
-//     return {
-//         position: Cesium.Cartesian3.fromDegrees(loc.Longitude, loc.Latitude),
-//         point: {
-//             pixelSize: startRadius,
-//             color: Cesium.Color.RED,
-//             outlineColor: Cesium.Color.RED,
-//             outlineWidth: 0,
-//         },
-//     }
-// }
 
 function createSatelliteRadiusEntity(loc, launchDate, lifespan) {
     const startRadius = 5.0;
@@ -74,7 +54,7 @@ function createSatelliteRadiusEntity(loc, launchDate, lifespan) {
                 const progress = elapsed / lifespan;
                 if (progress >= 1.0) return Cesium.Color.RED.withAlpha(0);
                 if (progress <= 0.0) return Cesium.Color.RED.withAlpha(1);
-                // return Cesium.Color.RED.withAlpha(0.1);
+
                 return Cesium.Color.RED.withAlpha(startAlpha * (1.0 - progress));
             }, false),
         },
