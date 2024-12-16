@@ -8,16 +8,56 @@
 // On the bottom left: pie chart
 // On the bottom right: a line graph（折线图） to show the launched number every year (static)
 import * as Cesium from "cesium";
-import {ctx} from "/js/utils/config";
+import { ctx } from "/js/utils/config";
 import * as d3 from "d3";
 
-const margin = {top: 20, right: 30, bottom: 40, left: 80};
+const margin = { top: 20, right: 60, bottom: 40, left: 80 };
 const COLOURS = {
     BUTTON_BG: "lightgray",
     BUTTON_ACTIVE: "steelblue",
     BAR_FILL: "steelblue",
-    LINE_STROKE: "steelblue"
+    LINE_STROKE: "steelblue",
+    starrySkyColorsArray: ["#2E3A87", "#E5E5E5", "#9B4F96", "#F1C6D1", "#1B4F6C", "#4F9AC8", "#D9A8D3", "#D9F2FF"]
 };
+
+const stateCode = {
+    "US": "United States",
+    "CN": "China",
+    "IN": "India",
+    "UK": "United Kingdom",
+    "RU": "Russian Federation",
+    "UY": "Uruguay",
+    "CA": "Canada",
+    "I": "Italy",
+    "I-EU": "Italy",
+    "I-ESA": "Italy",
+    "F": 'France',
+    "J": "Japan",
+    "D": "Germany",
+    "KR": "South Korea",
+    "E": "Spain",
+    "L": "Luxembourg"
+}
+
+const countryFlags = {
+    "US": "/img/flags/US.png",
+    "CN": "/img/flags/CN.png",
+    "IN": "/img/flags/IN.png",
+    "UK": "/img/flags/UK.png",
+    "RU": "/img/flags/RU.png",
+    "UY": "/img/flags/UY.png",
+    "CA": "/img/flags/CA.png",
+    "I": "/img/flags/I.png",
+    "I-EU": "/img/flags/I.png",
+    "F": "/img/flags/F.png",
+    "J": "/img/flags/J.png",
+    "D": "/img/flags/D.png",
+    "KR": "/img/flags/KR.png",
+    "E": "/img/flags/E.png",
+    "L": "/img/flags/L.png",
+}
+
+const colorScale = d3.scaleOrdinal(COLOURS.starrySkyColorsArray);
 
 let svgBar, xBar, yBar, plotType = "Country";
 let svgLine, xLine, yLine;
@@ -38,8 +78,14 @@ function changeTime(data) {
 
 function updateBarPlot(data, currentDate) {
     try {
+        const currentDiv = document.getElementById("vmagHist");
+        console.log(currentDiv.offsetWidth, currentDiv.offsetHeight)
         const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
         const filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
+
+        let currentYear = currentDate.getFullYear()
+        let totalCount = filteredData.length;
+
 
         let stateCount;
         if (plotType === "Country") {
@@ -57,20 +103,30 @@ function updateBarPlot(data, currentDate) {
         stateCount.sort((a, b) => b.value - a.value);
         stateCount = stateCount.slice(0, 5);
 
-        // Update scales
+
+        /*Update scales*/
         xBar.domain([0, d3.max(stateCount, d => d.value)]).nice();
         yBar.domain(stateCount.map(d => d.key));
 
         // Update axes
         svgBar.select(".x-axis")
             .transition().duration(500)
-            .call(d3.axisBottom(xBar).ticks(5));
+            .call(d3.axisBottom(xBar).ticks(5))
+            .selectAll("text")
+            .style("fill", "white") // Set axis label text color to white
+            .style("font-size", "12px");
 
         svgBar.select(".y-axis")
             .transition().duration(500)
-            .call(d3.axisLeft(yBar));
+            .call(d3.axisLeft(yBar))
+            .selectAll("text")
+            .style("fill", "white") // Set axis label text color to white
+            .style("font-size", "12px");
 
-        // Bind data
+        svgBar.selectAll(".x-axis path, .x-axis line, .y-axis path, .y-axis line")
+            .style("stroke", "white");
+
+        /*Bind and update data*/
         const bars = svgBar.selectAll(".bar")
             .data(stateCount, d => d.key);
 
@@ -88,24 +144,113 @@ function updateBarPlot(data, currentDate) {
             .attr("height", yBar.bandwidth())
             .attr("x", 0)
             .attr("width", 0)
-            .style("fill", COLOURS.BAR_FILL)
+            .style("fill", d => colorScale(d.key))
+            .on("mouseover", function (event, d) {
+                d3.select(this)
+                    .append("title")
+                    .text(() => stateCode[d.key] || d.key); // Use dictionary for full name
+            })
             .transition().duration(500)
             .attr("width", d => xBar(d.value));
+
 
         // Remove exiting bars
         bars.exit()
             .transition().duration(500)
             .attr("width", 0)
             .remove();
+
+        /*Update labels*/
+
+
+        // Add labels to each bar
+        const labels = svgBar.selectAll(".label")
+            .data(stateCount, d => d.key);
+
+        // Update existing labels
+        labels.transition().duration(500)
+            .attr("x", d => xBar(d.value) / 2 - 5) // Position slightly to the right of the bar
+            .attr("y", d => yBar(d.key) + yBar.bandwidth() / 2) // Vertically center the label
+            .text(d => d.value); // Update the text with the current value
+
+        // Enter new labels
+        labels.enter()
+            .append("text")
+            .attr("class", "label")
+            .attr("x", d => xBar(d.value) / 2 - 5) // Position slightly to the right of the bar
+            .attr("y", d => yBar(d.key) + yBar.bandwidth() / 2) // Vertically center the label
+            .attr("dy", "0.35em") // Offset to align vertically with the bar
+            .style("font-size", "12px")
+            .style("fill", "#000") // Color for the text
+            .text(d => d.value); // Set the text to the bar's value
+
+        labels.exit()
+            .remove();
+
+
+        const imgs = svgBar.selectAll(".countryImg")
+            .data(stateCount, d => d.key);
+        if (plotType === "Country") {
+
+            /* Update right-bottom display */
+            svgBar.selectAll(".dynamic-text").remove(); // 移除旧的文本
+
+            // 添加年份 (currentYear)
+            svgBar.append("text")
+                .attr("class", "dynamic-text year-text")
+                .attr("x", currentDiv.offsetWidth -margin.bottom*4) // 右边对齐，使用容器宽度
+                .attr("y", currentDiv.offsetHeight / 2) // 距离底部稍远
+                .attr("text-anchor", "end") // 右对齐
+                .style("fill", "lightgray")
+                .style("font-size", "32px") // 大字体
+                .style("font-weight", "bold")
+                .text(`${currentYear}`);
+
+            // 添加总条数 (totalCount)
+            svgBar.append("text")
+                .attr("class", "dynamic-text count-text")
+                .attr("x", currentDiv.offsetWidth -margin.bottom*4) // 右边对齐，使用容器宽度
+                .attr("y", currentDiv.offsetHeight / 2 + margin.bottom) // 更靠近底部
+                .attr("text-anchor", "end") // 右对齐
+                .style("fill", "lightgray")
+                .style("font-size", "20px") // 较小字体
+                .text(`Count: ${totalCount}`);
+
+            // Update existing images
+            imgs.transition().duration(500)
+                .attr("x", d => xBar(d.value) + 10) // Adjust position slightly to the right of the bar
+                .attr("y", d => yBar(d.key)) // Vertically center the flag image
+                .attr("width", yBar.bandwidth()) // Set the flag width
+                .attr("height", yBar.bandwidth()) // Set the flag height
+                .attr("xlink:href", d => countryFlags[d.key] || "/img/flags/flag.png"); // Update image source
+
+            // Enter new images
+            imgs.enter()
+                .append("image")
+                .attr("class", "countryImg")
+                .attr("x", d => xBar(d.value) + 10) // Position to the right of the bar
+                .attr("y", d => yBar(d.key)) // Vertically center the image
+                .attr("width", yBar.bandwidth()) // Set the flag width
+                .attr("height", yBar.bandwidth()) // Set the flag height
+                .attr("xlink:href", d => countryFlags[d.key] || "/img/flags/flag.png"); // Default flag if not found
+
+            // Remove exiting images
+            imgs.exit().remove();
+        } else {
+            imgs.exit().remove();
+
+        }
     } catch (error) {
         console.error("Error updating bar plot:", error);
     }
+
+
 }
 
 function initBarPlot() {
     try {
         const vmagHistDiv = document.getElementById('vmagHist');
-        const {clientWidth: currentWidth, clientHeight: currentHeight} = vmagHistDiv;
+        const { clientWidth: currentWidth, clientHeight: currentHeight } = vmagHistDiv;
 
         const width = currentWidth - margin.left - margin.right;
         const height = currentHeight - margin.top - margin.bottom;
@@ -133,15 +278,15 @@ function initBarPlot() {
 
         // Create toggle buttons
         const toggleBar = svgContainer.append("g")
-            .attr("transform", `translate(${margin.left},${margin.top - 30})`);
+            .attr("transform", `translate(${margin.left},${margin.top - 20})`);
 
         const buttons = [
-            {id: "button-country", label: "Country"},
-            {id: "button-agent", label: "Agent"}
+            { id: "button-country", label: "Country" },
+            { id: "button-agent", label: "Agent" }
         ];
 
         const buttonWidth = 80;
-        const buttonHeight = 25;
+        const buttonHeight = 20;
         const buttonSpacing = 10;
 
         const buttonGroups = toggleBar.selectAll(".button-group")
@@ -182,7 +327,7 @@ function initBarPlot() {
 function initLineChart() {
     try {
         const linePlotDiv = document.getElementById("linePlot");
-        const {clientWidth: currentWidth, clientHeight: currentHeight} = linePlotDiv;
+        const { clientWidth: currentWidth, clientHeight: currentHeight } = linePlotDiv;
 
         const width = currentWidth - margin.left - margin.right;
         const height = currentHeight - margin.top - margin.bottom;
@@ -222,12 +367,17 @@ function initLineChart() {
             .attr("transform", `translate(0, ${height})`)
             .call(d3.axisBottom(xLine).tickFormat(d3.format("d")))
             .selectAll("text")
+            .style("fill", "white")
             .style("font-size", "10px");
 
         svgLine.append("g")
-            .call(d3.axisLeft(yLine))
+            .call(d3.axisLeft(yLine).ticks(4))
             .selectAll("text")
+            .style("fill", "white")
             .style("font-size", "10px");
+
+        svgLine.selectAll(".domain, .tick line")
+            .style("stroke", "white");
 
         // Define line generator
         const line = d3.line()
@@ -238,7 +388,7 @@ function initLineChart() {
         svgLine.append("path")
             .datum(yearCount)
             .attr("fill", "none")
-            .attr("stroke", COLOURS.LINE_STROKE)
+            .attr("stroke", "white")
             .attr("stroke-width", 2)
             .attr("d", line);
     } catch (error) {
@@ -252,14 +402,14 @@ export function createStatViz() {
 
         const statsDiv = document.getElementById("stats");
         statsDiv.style.backgroundColor = "blue";
-        const {offsetWidth: currentWidth, offsetHeight: currentHeight} = statsDiv;
+        const { offsetWidth: currentWidth, offsetHeight: currentHeight } = statsDiv;
         // console.log(currentHeight, currentWidth);
 
         const vmagHistDiv = document.getElementById("vmagHist");
         Object.assign(vmagHistDiv.style, {
             width: `${currentWidth - 20}px`,
-            height: `${currentHeight - 150}px`,
-            backgroundColor: "white",
+            height: `${currentHeight / 7 * 4}px`,
+            backgroundColor: "black",
             padding: "10px",
             borderRadius: "5px"
         });
@@ -267,12 +417,12 @@ export function createStatViz() {
         const linePlotDiv = document.getElementById("linePlot");
         Object.assign(linePlotDiv.style, {
             width: `${currentWidth - 20}px`,
-            height: `${currentHeight - vmagHistDiv.offsetHeight - 22}px`,
-            backgroundColor: "white",
+            height: `${currentHeight - vmagHistDiv.offsetHeight - 20}px`,
+            backgroundColor: "black",
             padding: "10px",
             borderRadius: "5px",
             position: "relative",
-            marginTop: "2px"
+            // marginTop: "2px"
         });
 
         initBarPlot();
