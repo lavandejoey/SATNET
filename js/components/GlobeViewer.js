@@ -9,7 +9,7 @@ Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 
 export async function GlobeViewer() {
     // Set up the basic Cesium viewer
-    const view3D = new Cesium.Viewer('cesiumContainer3D', CESIUM_3D_CONFIG);
+    const view3D = new Cesium.Viewer("cesium3DViewContainer", CESIUM_3D_CONFIG);
 
     // await view3D.imageryLayers.addImageryProvider(ionImageryProvider);
 

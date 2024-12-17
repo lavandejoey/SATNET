@@ -114,12 +114,12 @@ export const CESIUM_SHARE_CLOCK = new Cesium.Clock({
     shouldAnimate: true // Animation enabled by default
 });
 
-// export const ionImageryProvider = await Cesium.IonImageryProvider.fromAssetId(3954);
-export const ionImageryProvider = undefined;
+export const ionImageryProvider = await Cesium.IonImageryProvider.fromAssetId(3954);
+// export const ionImageryProvider = undefined;
 
 // Common Cesium configuration
 const CESIUM_SHARE_CONFIG = {
-    imageryProvider: ionImageryProvider,
+    // imageryProvider: ionImageryProvider,
     baseLayerPicker: false,
     terrain: undefined,
     infoBox: false,

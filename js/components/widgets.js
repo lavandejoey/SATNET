@@ -1,22 +1,20 @@
 // js/components/widgets.js
 import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
+import {initCamera, INITIAL_CAMERA_3D} from "../utils/camera";
 
 export async function addWidgets() {
     setWatermark();
     setTimelineAndAnimation();
 
-    // Add Checkbox Widget for Selecting Satellite Groups filter
-    const widgetContainer3D = document.getElementById('cesiumContainer3DWidgets');
+    addButtons();
 
-    if (widgetContainer3D) {
-        addSatelliteGroupCheckboxes(widgetContainer3D);
-    }
+    addSatelliteGroupOptions();
 }
 
 function setWatermark() {
     // remove all cesium-viewer-bottom
-    let watermark = document.getElementsByClassName('cesium-viewer-bottom');
+    let watermark = document.getElementsByClassName("cesium-viewer-bottom");
     while (watermark.length > 0) {
         watermark[0].parentNode.removeChild(watermark[0]);
     }
@@ -24,101 +22,133 @@ function setWatermark() {
 
 function setTimelineAndAnimation() {
     // Add animation
-    const animationContainer = document.getElementById('cesiumContainerAnimation');
+    const animationContainer = document.getElementById("cesiumContainerAnimation");
     const animationViewModel = new Cesium.AnimationViewModel(ctx.view3D.clockViewModel);
     const animationWidget = new Cesium.Animation(animationContainer, animationViewModel);
     animationWidget.resize();
 
     // Add timeline
-    const timelineContainer = document.getElementById('cesiumContainerTimeline');
+    const timelineContainer = document.getElementById("cesiumContainerTimeline");
     const timelineWidget = new Cesium.Timeline(timelineContainer, ctx.view3D.clock);
     timelineWidget.zoomTo(ctx.view3D.clock.startTime, ctx.view3D.clock.stopTime);
     timelineWidget.resize();
     // connect timeline with clock change time
-    timelineWidget.addEventListener('settime', function (e) {
+    timelineWidget.addEventListener("settime", function (e) {
         ctx.view3D.clock.currentTime = e.timeJulian;
         ctx.view3D.clock.shouldAnimate = false;
     });
 }
 
-function addSatelliteGroupCheckboxes(widgetContainer3D) {
-    // Create a container for checkboxes
-    const checkboxContainer = document.createElement('div');
-    checkboxContainer.setAttribute('id', 'satelliteGroupCheckboxes');
-    // relative fix position to cesiumContainer3DWidgets
-    checkboxContainer.style.position = 'relative';
-    checkboxContainer.style.top = '0';
-    checkboxContainer.style.left = '0';
-    checkboxContainer.style.padding = '10px';
-    checkboxContainer.style.color = 'white';
-    checkboxContainer.style.zIndex = '1000';
-    checkboxContainer.style.backgroundColor = 'rgba(0, 0, 0, 0)';
-    checkboxContainer.style.flexDirection = 'row';
-    checkboxContainer.style.alignItems = 'center';
+function addButtons() {
+    // **Bind the "Go Home" Button to the `initCamera` Function**
+    const goHomeButton = document.getElementById("goHome");
+    if (goHomeButton) {
+        goHomeButton.addEventListener("click", () => {
+            initCamera(ctx.view3D, INITIAL_CAMERA_3D);
+        });
+    } else {
+        console.warn("Go Home button with ID 'goHome' not found in the DOM.");
+    }
 
+}
 
-    // Create and add a "Select All" checkbox
-    const selectAllCheckbox = document.createElement('input');
-    selectAllCheckbox.type = 'checkbox';
-    selectAllCheckbox.checked = true;
-    selectAllCheckbox.id = 'selectAllCheckbox';
+export function addSatelliteGroupOptions() {
+    // Add Checkbox Widget for Selecting Satellite Groups filter
+    const controllerContainer = document.getElementById("controllerContainer");
+    if (!controllerContainer) return
 
-    const selectAllLabel = document.createElement('label');
-    selectAllLabel.setAttribute('for', 'selectAllCheckbox');
-    selectAllLabel.textContent = 'Select All';
-    selectAllLabel.style.color = 'white';
+    // Get the placeholder element inside the dropdown
+    const optionContainer = document.getElementById("satelliteGroupOptions");
 
-    checkboxContainer.appendChild(selectAllCheckbox);
-    checkboxContainer.appendChild(selectAllLabel);
+    // Create a container for the options
+    const container = document.createElement("div");
+    container.classList.add("d-flex", "flex-column", "align-items-center"); // Center horizontally
 
-    // Add hrule line break for better layout
-    checkboxContainer.appendChild(document.createElement('hr'));
+    // Create and add a "Select All" option
+    const selectAllOption = document.createElement("div");
+    selectAllOption.classList.add("option-item", "selected", "w-100", "p-1");
+    selectAllOption.textContent = "Select All";
+    selectAllOption.style.cursor = "pointer";
+    selectAllOption.style.textAlign = "center";
+    selectAllOption.style.userSelect = "none";
 
-    // Create checkboxes for each satellite group
+    container.appendChild(selectAllOption);
+
+    // Add a horizontal rule
+    const hr = document.createElement("hr");
+    hr.classList.add("dropdown-divider", "w-100");
+    container.appendChild(hr);
+
+    // Create options for each satellite group
     Object.values(ctx.SAT_GROUP).forEach(group => {
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = true; // Default to all selected
-        checkbox.id = `checkbox-${group.NAME}`;
-        checkbox.dataset.groupName = group.NAME;
+        const option = document.createElement("div");
+        option.classList.add("option-item", "selected", "w-100", "p-1");
+        option.textContent = group.NAME;
+        // option.textContent = group.NAME + " (" + group.DATA.length + " instances)";
+        option.style.cursor = "pointer";
+        option.style.textAlign = "center";
+        option.style.userSelect = "none";
+        option.style.color = group.COLOR.toCssColorString();
+        option.dataset.groupName = group.NAME;
 
-        const label = document.createElement('label');
-        label.setAttribute('for', `checkbox-${group.NAME}`);
-        label.textContent = group.NAME;
-        label.style.color = group.COLOR.toCssColorString();
-
-        // Append checkbox and label to the container
-        checkboxContainer.appendChild(checkbox);
-        checkboxContainer.appendChild(label);
-        checkboxContainer.appendChild(document.createElement('br')); // Add line break for better layout
+        container.appendChild(option);
     });
 
-    widgetContainer3D.appendChild(checkboxContainer);
+    optionContainer.appendChild(container);
 
-    // Event Listener for "Select All" Checkbox
-    selectAllCheckbox.addEventListener('change', (event) => {
-        const isChecked = event.target.checked;
+    // Function to update the "Select All" state based on individual selections
+    function updateSelectAllState() {
+        const allSelected = Object.values(ctx.SAT_GROUP).every(group => group.SELECTED);
+        if (allSelected) {
+            selectAllOption.classList.add("selected");
+            selectAllOption.classList.remove("unselected");
+        } else {
+            selectAllOption.classList.add("unselected");
+            selectAllOption.classList.remove("selected");
+        }
+    }
 
-        // Update all checkboxes and satellite group visibility
+    // Event Listener for "Select All" Option
+    selectAllOption.addEventListener("click", () => {
+        const shouldSelectAll = !selectAllOption.classList.contains("selected");
+
+        // Toggle "Select All" state
+        if (shouldSelectAll) {
+            selectAllOption.classList.add("selected");
+            selectAllOption.classList.remove("unselected");
+        } else {
+            selectAllOption.classList.add("unselected");
+            selectAllOption.classList.remove("selected");
+        }
+
+        // Update all satellite groups
         Object.values(ctx.SAT_GROUP).forEach(group => {
-            const groupCheckbox = document.querySelector(`#checkbox-${group.NAME}`);
-            groupCheckbox.checked = isChecked;
-            group.SELECTED = isChecked;
+            group.SELECTED = shouldSelectAll;
+            const option = container.querySelector(`[data-group-name="${group.NAME}"]`);
+            if (shouldSelectAll) {
+                option.classList.add("selected");
+                option.classList.remove("unselected");
+            } else {
+                option.classList.add("unselected");
+                option.classList.remove("selected");
+            }
         });
     });
 
-    // Event Listener for Individual Group Checkboxes
+    // Event Listeners for Individual Group Options
     Object.values(ctx.SAT_GROUP).forEach(group => {
-        const checkbox = document.querySelector(`#checkbox-${group.NAME}`);
-        checkbox.addEventListener('change', (event) => {
-            // Update satellite group visibility
-            group.SELECTED = event.target.checked;
+        const option = container.querySelector(`[data-group-name="${group.NAME}"]`);
+        option.addEventListener("click", () => {
+            // Toggle selection state
+            group.SELECTED = !group.SELECTED;
+            option.classList.toggle("selected");
+            option.classList.toggle("unselected");
 
-            // Update "Select All" checkbox state
-            selectAllCheckbox.checked = Object.values(ctx.SAT_GROUP).every(group => {
-                const groupCheckbox = document.querySelector(`#checkbox-${group.NAME}`);
-                return groupCheckbox.checked;
-            });
+            // Update "Select All" state
+            updateSelectAllState();
         });
     });
+
+    // Initialize "Select All" state
+    updateSelectAllState();
 }

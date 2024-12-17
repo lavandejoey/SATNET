@@ -1,57 +1,77 @@
 /* public/styles/main.css */
 
-body, html, #app {
+:root {
+    --panel-width: 10vw;
+    --viewer-width: 45vw;
+    --stat-width: 45vw;
+}
+
+body, html #stats, #panelContainer, #cesium3DViewContainer, #cesium2DViewContainer, #cesiumContainerWidgets {
+    background: #000000 !important;
+    color: #fff !important;
+}
+
+body, html {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #040404;
+}
+
+/*border and line*/
+#stats, #panelContainer, #cesium3DViewContainer, #cesium2DViewContainer {
+    a {
+        color: papayawhip;
+    }
 }
 
 #stats {
     position: absolute;
-    top: 40%;
-    left: 50%;
-    right: 0;
+    top: 0;
+    left: calc(var(--panel-width) + var(--viewer-width));
+    width: var(--stat-width);
     bottom: 30px;
-    /*bg color and repeated shape TODO */
-    /*background: #181818 url(../img/img.png) repeat 0 0;*/
 }
 
-#cesiumContainer3D {
-    background-color: rgba(0, 0, 0, 0) !important;
+#panelContainer {
     position: absolute;
     top: 0;
     left: 0;
-    width: 50%;
-    height: 100%;
+    width: var(--panel-width);
+    bottom: 0;
 }
 
-#cesiumContainer3DWidgets {
-    background-color: rgba(0, 0, 0, 0) !important;
-    position: relative;
+#cesium3DViewContainer, #cesium2DViewContainer {
+    position: absolute;
+    left: var(--panel-width);
+    width: var(--viewer-width);
+}
+
+#cesium3DViewContainer {
     top: 0;
-    left: 0;
-    right: 0;
-    height: 0;
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: flex-start;
+    bottom: calc(var(--viewer-width) * 0.5 + 30px);
 }
 
-#cesiumContainer2D {
+#cesium2DViewContainer {
+    height: calc(var(--viewer-width) * 0.5);
+    bottom: 30px;
+}
+
+#satInfo {
     position: absolute;
     top: 0;
-    left: 50%;
-    width: 50%;
-    height: 40%;
+    left: var(--panel-width);
+    width: max-content;
+    background: rgba(28, 28, 56, 0.6);
+    margin: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 9;
+    display: none;
 }
 
 #cesiumContainerWidgets {
-    /*bg colour 181818*/
-    background-color: #181818;
     position: absolute;
     /*top: 100%;*/
     bottom: 0;
@@ -124,4 +144,22 @@ body, html, #app {
 .cesium-selection-wrapper svg path {
     transform: scale(0.2) !important;
     z-index: -1 !important;
+}
+
+
+/* Include the CSS from Step 4 here */
+.option-item.selected {
+    background-color: #343a40;
+}
+
+.option-item.unselected {
+    background-color: #343a40;
+    opacity: 0.8;
+    color: lightslategray !important;
+}
+
+.option-item:hover {
+    background-color: #495057;
+    opacity: 1;
+    color: antiquewhite !important;
 }

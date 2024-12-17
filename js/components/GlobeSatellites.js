@@ -7,14 +7,25 @@ import {loadOrbitsTLEDate} from "/js/utils/data";
 export function handleSatelliteClick() {
     function clearSelection() {
         if (ctx.currentSatelliteEntity) {
-            ctx.currentSatelliteEntity.label.show = false;
+            ctx.currentSatelliteEntity.label.show = new Cesium.CallbackProperty(() => {
+                const cameraHeight = ctx.view3D.camera.positionCartographic.height;
+                return cameraHeight <= 1e7; // Show labels only at closer zoom levels
+            }, false);
             ctx.currentSatelliteEntity.outlineColor = undefined;
             ctx.currentSatelliteEntity = null;
         }
 
+        // Remove previous orbit entity
         if (ctx.currentOrbitEntity) {
             ctx.view3D.entities.remove(ctx.currentOrbitEntity);
             ctx.currentOrbitEntity = null;
+        }
+
+        // Hide info card
+        const infoCard = document.getElementById("satInfo");
+        if (infoCard) {
+            infoCard.style.display = "none";
+            infoCard.innerHTML = "";
         }
     }
 
@@ -26,12 +37,25 @@ export function handleSatelliteClick() {
         if (Cesium.defined(pickedObject) && pickedObject.id) {
             const satelliteEntity = pickedObject.id;
             ctx.currentSatelliteEntity = satelliteEntity;
-            ctx.currentSatelliteEntity.label.show = true;
+
+            // Instead of showing the label on the globe, hide it
+            ctx.currentSatelliteEntity.label.show = false;
             ctx.currentSatelliteEntity.outlineColor = Cesium.Color.WHITE;
 
             // Retrieve the satellite's TLE/propagation data
             const satData = satelliteEntity.properties?.satData?.getValue();
             if (satData && satData.SatRec) {
+                // Display the satellite info in the fixed info card
+                const infoCard = document.getElementById("satInfo");
+                if (infoCard) {
+                    infoCard.style.display = "block";
+                    infoCard.innerHTML = `
+                        <div class="lead">${satData.Name}</div>
+                        <p>Launch Date: ${new Date(satData.Launch_Date).toUTCString()}</p>
+                    `;
+                }
+
+                // Generate and display orbit
                 const startTime = ctx.view3D.clock.currentTime;
                 const orbitPositions = [];
                 const interval = 5; // minutes
@@ -130,7 +154,7 @@ function createSatelliteEntity(satGroup, satData) {
             pixelOffset: new Cesium.Cartesian2(0, -10),
             show: new Cesium.CallbackProperty(() => {
                 const cameraHeight = ctx.view3D.camera.positionCartographic.height;
-                return cameraHeight < 1e7; // Show labels only at closer zoom levels
+                return cameraHeight <= 1e7; // Show labels only at closer zoom levels
             }, false),
         },
         // Store satData in the entity's properties for later retrieval

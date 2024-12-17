@@ -1,8 +1,9 @@
 // /js/cesium.js
+import 'bootstrap';
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import {MapViewer} from "/js/components/MapViewer";
 import {GlobeViewer} from "/js/components/GlobeViewer";
-import {addWidgets} from "/js/components/widgets";
+import {addSatelliteGroupOptions, addWidgets} from "/js/components/widgets";
 import {displaySatellites} from "/js/components/GlobeSatellites";
 import {display2DSatellites} from "/js/components/MapSatellites";
 import {createStatViz} from "/js/components/StatMap";

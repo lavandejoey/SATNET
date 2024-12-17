@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import {defineConfig} from 'vite';
 import cesium from 'vite-plugin-cesium';
 
 export default defineConfig({
@@ -15,7 +15,17 @@ export default defineConfig({
     },
     plugins: [cesium()],
     optimizeDeps: {
-        include: ['cesium'],
+        include: ["cesium"],
     },
-    publicDir: 'public',
+    publicDir: "public",
+    server: {
+        host: "127.0.0.1",
+        port: 4170,
+        strictPort: true,
+    },
+    preview: {
+        host: "127.0.0.1",
+        port: 4170,
+        strictPort: true,
+    }
 });

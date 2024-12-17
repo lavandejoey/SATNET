@@ -10,7 +10,7 @@ export const initCamera = (viewer, cameraConfig) => {
 
 export const INITIAL_CAMERA_3D = {
     // Paris as home
-    destination: Cartesian3.fromDegrees(2.3488, 48.8534, 15e6), // Paris
+    destination: Cartesian3.fromDegrees(2.3488, 48.8534, 2e7), // Paris
     orientation: {
         heading: CesiumMath.toRadians(0),
         pitch: CesiumMath.toRadians(-90),
