@@ -16,11 +16,18 @@ export function display2DSatellites() {
 
                 if (currentTime.toDateString() === launchDate.toDateString()) {
                     const launchRadiusEntity = createSatelliteRadiusEntity(loc, launchDate, lifespan);
+                    const launchEntity = createSatelliteEntity(loc);
                     // 5seconds remove the point
                     if (launchRadiusEntity) {
                         var entity_id = ctx.view2D.entities.add(launchRadiusEntity);
                     }
+                    if (launchEntity){
+                        var entity2_id = ctx.view2D.entities.add(launchEntity);
+                    }
                     setTimeout(() => {
+                        if (entity2_id){
+                            ctx.view2D.entities.remove(entity2_id);
+                        }
                         if (entity_id) {
                             ctx.view2D.entities.remove(entity_id);
                         }
@@ -30,6 +37,19 @@ export function display2DSatellites() {
         });
     } catch (error) {
         console.error("Error initializing satellites:", error);
+    }
+}
+
+function createSatelliteEntity(loc){
+    const startRadius = 3.0;
+    return {
+        position: Cesium.Cartesian3.fromDegrees(loc.Longitude, loc.Latitude),
+        point: {
+            pixelSize: startRadius,
+            color: Cesium.Color.RED.withAlpha(0.5),
+            outlineColor: Cesium.Color.RED.withAlpha(0.5),
+            outlineWidth: 0,
+        },
     }
 }
 
@@ -50,14 +70,15 @@ function createSatelliteRadiusEntity(loc, launchDate, lifespan) {
                 return startRadius + progress * (maxRadius - startRadius);
             }, false),
             color: Cesium.Color.TRANSPARENT,
-            outlineColor: new Cesium.CallbackProperty((time) => {
-                const elapsed = (new Date() - startTime);
-                const progress = elapsed / lifespan;
-                if (progress >= 1.0) return Cesium.Color.RED.withAlpha(0);
-                if (progress <= 0.0) return Cesium.Color.RED.withAlpha(1);
-
-                return Cesium.Color.RED.withAlpha(startAlpha * (1.0 - progress));
-            }, false),
+            outlineColor: Cesium.Color.RED.withAlpha(0.8),
+            // outlineColor: new Cesium.CallbackProperty((time) => {
+            //     const elapsed = (new Date() - startTime);
+            //     const progress = elapsed / lifespan;
+            //     if (progress >= 1.0) return Cesium.Color.RED.withAlpha(0);
+            //     if (progress <= 0.0) return Cesium.Color.RED.withAlpha(1);
+            //     // return Cesium.Color.RED.withAlpha(0.1);
+            //     return Cesium.Color.RED.withAlpha(startAlpha * (1.0 - progress));
+            // }, false),
         },
     };
 }
