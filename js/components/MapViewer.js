@@ -11,7 +11,7 @@ export async function MapViewer() {
     // set up the basic Cesium viewer
     const view2D = new Cesium.Viewer("cesium2DViewContainer", CESIUM_2D_CONFIG);
 
-    // await view2D.imageryLayers.addImageryProvider(ionImageryProvider);
+    await view2D.imageryLayers.addImageryProvider(ionImageryProvider);
 
     view2D.scene.globe.enableLighting = true;
 

@@ -3,6 +3,7 @@ import * as satellite from "satellite.js";
 import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
 import {loadOrbitsTLEDate} from "/js/utils/data";
+import {ORBIT_TYPES} from "../utils/constants.js";
 
 export function handleSatelliteClick() {
     function clearSelection() {
@@ -51,37 +52,60 @@ export function handleSatelliteClick() {
                     infoCard.style.display = "block";
                     infoCard.innerHTML = `
                         <div class="lead">${satData.Name}</div>
-                        <p>Launch Date: ${new Date(satData.Launch_Date).toUTCString()}</p>
+                        <p class="mx-0 my-1 y-0">By: ${satData.Launch_State}</p>
+                        <p class="mx-0 my-1 y-0">From: ${new Date(satData.Launch_Date).toUTCString()}</p>
+                        <p class="mx-0 my-1 y-0">Type: ${ORBIT_TYPES[satData.Orbit_Type].name}</p>
                     `;
                 }
 
                 // Generate and display orbit
                 const startTime = ctx.view3D.clock.currentTime;
                 const orbitPositions = [];
-                const interval = 5; // minutes
-                // Generate orbit positions for 24 hours at 5-minute intervals
-                for (let minutes = 0; minutes < 1440; minutes += interval) {
-                    const time = Cesium.JulianDate.addMinutes(startTime, minutes, new Cesium.JulianDate());
-                    const date = Cesium.JulianDate.toDate(time);
+                const interval = 5; // Sampling interval in minutes
 
-                    try {
-                        const { position } = satellite.propagate(satData.SatRec, date);
-                        const cartesian = eciToCartesian3(position, date);
-                        if (cartesian) {
-                            orbitPositions.push(cartesian);
+                // Propagate the satellite to calculate the initial altitude
+                try {
+                    const initialDate = Cesium.JulianDate.toDate(startTime);
+                    const { position } = satellite.propagate(satData.SatRec, initialDate);
+                    const cartesian = eciToCartesian3(position, initialDate);
+
+                    const orbitLength = ORBIT_TYPES[satData.Orbit_Type]?.period;
+                    if (cartesian) {
+                        // Generate orbit positions for the calculated orbit length
+                        for (let minutes = 0; minutes <orbitLength ; minutes += interval) {
+                            const time = Cesium.JulianDate.addMinutes(startTime, minutes, new Cesium.JulianDate());
+                            const date = Cesium.JulianDate.toDate(time);
+
+                            try {
+                                const { position } = satellite.propagate(satData.SatRec, date);
+                                const cartesian = eciToCartesian3(position, date);
+                                if (cartesian) {
+                                    orbitPositions.push(cartesian);
+                                }
+                            } catch (error) {
+                                console.warn(`Error propagating orbit for ${satelliteEntity.name}:`, error);
+                            }
                         }
-                    } catch (error) {
-                        console.warn(`Error propagating orbit for ${satelliteEntity.name}:`, error);
                     }
+                } catch (error) {
+                    console.error("Error calculating initial altitude:", error);
                 }
 
-                // Create a polyline entity to visualize the orbit
+                // Add the orbit as a glowing polyline
                 ctx.currentOrbitEntity = ctx.view3D.entities.add({
+                    id: "orbit",
                     name: `${satelliteEntity.name}-orbit`,
                     polyline: {
-                        positions: orbitPositions,
+                        positions: orbitPositions.reverse(),
                         width: 2,
-                        material: Cesium.Color.WHITESMOKE.withAlpha(0.8),
+                        material: new Cesium.PolylineGlowMaterialProperty({
+                            // Intensity of the glow
+                            glowPower: 0.3,
+                            color: Cesium.Color.ALICEBLUE.withAlpha(0.8),
+                            // Shining on two sides of line
+                            taperPower: 0.5
+                        }),
+                        // Orbit above ground
                         clampToGround: false
                     }
                 });

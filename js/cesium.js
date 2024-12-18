@@ -1,6 +1,8 @@
 // /js/cesium.js
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import 'cesium/Build/Cesium/Widgets/widgets.css';
 import 'bootstrap';
-import "cesium/Build/Cesium/Widgets/widgets.css";
 import {MapViewer} from "/js/components/MapViewer";
 import {GlobeViewer} from "/js/components/GlobeViewer";
 import {addSatelliteGroupOptions, addWidgets} from "/js/components/widgets";
@@ -8,24 +10,12 @@ import {displaySatellites} from "/js/components/GlobeSatellites";
 import {display2DSatellites} from "/js/components/MapSatellites";
 import {createStatViz} from "/js/components/StatMap";
 import {loadLaunchLog, loadSites} from "/js/utils/data";
+import {loadPage} from "./utils/loadPage.js";
 import {ctx} from "/js/utils/config";
-
-async function loadingPage() {
-    // Once both are loaded and we have ctx.view3D and ctx.view2D not null, hide the loading overlay
-    while (ctx.view2D === null || ctx.view3D === null) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    // Delay to hide the loading overlay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.classList.add('hidden');
-    }
-}
 
 async function loadViz() {
     // Loading page
-    loadingPage().then(() => console.log("Page loaded"));
+    loadPage().then(() => console.log("Page loaded"));
 
     /********************************************* Viewer Initialization *********************************************/
     // Load the 3D and 2D viewers

@@ -1,11 +1,13 @@
 // js/utils/data.js
 import * as d3 from "d3";
+import * as Cesium from "cesium";
+import * as satellite from "satellite.js";
 import {ctx} from "/js/utils/config";
 import {getCachedData, isCacheValid, saveToCache} from "/js/utils/cacheUtils";
-import * as satellite from "satellite.js";
+import {EARTH_RADIUS_METERS, ORBIT_TYPES} from "./constants.js";
 
 // Keep col: #Launch_Tag, Launch_Date, Piece, Name, PLName, SatOwner, SatState, Launch_Site
-const REQUIRED_COLUMNS = ["#Launch_Tag", "Launch_Date", "Piece", "Name", "PLName", "SatOwner", "SatState", "Launch_Site"];
+const REQUIRED_COLUMNS = ["#Launch_Tag", "Launch_Date", "Piece", "Name", "PLName", "SatOwner", "SatState", "Launch_Site", "LVState"];
 const SITE_REQUIRED_COLUMNS = ["#Site", "Longitude", "Latitude"];
 
 function parseStringDate(rawDatetime) {
@@ -145,6 +147,32 @@ export async function loadLaunchLog() {
     }
 }
 
+function determineOrbitType(satrec) {
+    // Semi-major axis in meters
+    const semiMajorAxis = satrec.a * EARTH_RADIUS_METERS;
+    // Orbital altitude in meters
+    const altitude = semiMajorAxis - EARTH_RADIUS_METERS
+    // Inclination in degrees
+    const inclination = Cesium.Math.toDegrees(satrec.inclo);
+
+    // Check for Sun-synchronous orbit
+    if (
+        inclination >= ORBIT_TYPES.SSO.inclMin &&
+        inclination <= ORBIT_TYPES.SSO.inclMax &&
+        altitude < ORBIT_TYPES.LEO.maxAltitude
+    ) {
+        return ORBIT_TYPES.SSO.id;
+    }
+
+    // Determine by altitude ranges
+    if (altitude < ORBIT_TYPES.LEO.maxAltitude) return ORBIT_TYPES.LEO.id;
+    if (altitude >= ORBIT_TYPES.MEO.minAltitude && altitude < ORBIT_TYPES.MEO.maxAltitude) return ORBIT_TYPES.MEO.id;
+    if (altitude >= ORBIT_TYPES.GEO.minAltitude && altitude <= ORBIT_TYPES.GEO.maxAltitude) return ORBIT_TYPES.GEO.id;
+    if (altitude > ORBIT_TYPES.GEO.maxAltitude) return ORBIT_TYPES.HEO.id;
+
+    return ORBIT_TYPES.UNKNOWN.id;
+}
+
 export async function loadOrbitsTLEDate(satGroup) {
     // Check if the satellite name exists ctx.SAT_GROUP
     const satName = satGroup.NAME;
@@ -178,16 +206,19 @@ export async function loadOrbitsTLEDate(satGroup) {
                 continue;
             }
             const satRec = satellite.twoline2satrec(line1, line2);
+            const orbitType = determineOrbitType(satRec);
 
             // Name Date with some special processing
-            const [name, launchDate] = satellitesAlignments(satGroup, lines[idx].trim());
+            const [name, launchDate, launchState] = satellitesAlignments(satGroup, lines[idx].trim());
 
             // sat rec
             if (satRec && launchDate) {
                 satellites.push({
                     Name: name,
                     Launch_Date: launchDate,
+                    Launch_State: launchState,
                     SatRec: satRec,
+                    Orbit_Type: orbitType,
                 });
             } else {
                 console.warn(`Failed to process TLE data for ${name}, ld:${launchDate}, rec:${satRec}`);
@@ -205,12 +236,17 @@ export async function loadOrbitsTLEDate(satGroup) {
 }
 
 function satellitesAlignments(satGroup, rawName) {
-    let name, launchDate;
+    let name, launchDate, launchState;
     switch (satGroup) {
         /****************************************** Communication Satellites ******************************************/
         case ctx.SAT_GROUP.STARLINK:
             name = rawName.replaceAll('-', ' ').split(' ').slice(0, 2).join(' ');
-            launchDate = ctx.LAUNCHLOG.DATA.find(row => row.Name.toLowerCase() === name.toLowerCase())?.Launch_Date;
+            ctx.LAUNCHLOG.DATA.find(row => {
+                if(row.Name.toLowerCase() === name.toLowerCase()){
+                    launchDate = row.Launch_Date;
+                    launchState = row.LVState;
+                }
+            });
             break;
         /******************************************* Navigation Satellites *******************************************/
         case ctx.SAT_GROUP.BEIDOU:
@@ -223,10 +259,12 @@ function satellitesAlignments(satGroup, rawName) {
                 .replace("Q", "Q")
                 //Beidou-3-S I1-S -> Beidou-3 I1-S, Beidou-2-S W1-S -> Beidou-2 W1-S
                 .replace(/Beidou-(\d+)-S\s*(\w+)/, "Beidou-$1 $2");
-            launchDate = ctx.LAUNCHLOG.DATA.find(row => {
-                const plName = row.PLName.split("(")[0].trim().toLowerCase();
-                return plName === name.toLowerCase() || plName === (name + "Q").toLowerCase();
-            })?.Launch_Date;
+            ctx.LAUNCHLOG.DATA.find(row => {
+                if(row.PLName.split("(")[0].trim().toLowerCase() === (name.toLowerCase() || (name + "Q").toLowerCase())){
+                    launchDate = row.Launch_Date;
+                    launchState = row.LVState;
+                }
+            });
             // console.log(`Beidou: ${rawName}->${name}, ${launchDate}`);
             break;
         case ctx.SAT_GROUP.GALILEO:
@@ -250,24 +288,38 @@ function satellitesAlignments(satGroup, rawName) {
                 }
             }
             name = `${namePrefix}${number}`;
-
-            launchDate = ctx.LAUNCHLOG.DATA.find(row => row.Name.toLowerCase() === name.toLowerCase())?.Launch_Date;
+            ctx.LAUNCHLOG.DATA.find(row => {
+               if (row.Name.toLowerCase() === name.toLowerCase()) {
+                   launchDate = row.Launch_Date;
+                   launchState = row.LVState;
+               }
+            });
             // console.log(`Galileo: ${name}, ${launchDate}`);
             break;
         /********************************************* Weather Satellites *********************************************/
         case ctx.SAT_GROUP.NOAA:
             name = rawName.split("(")[0].trim().replaceAll(' ', '-');
-            launchDate = ctx.LAUNCHLOG.DATA.find(row => row.Name.toLowerCase().replaceAll(' ', '-') === name.toLowerCase())?.Launch_Date;
+            ctx.LAUNCHLOG.DATA.find(row => {
+                if (row.Name.toLowerCase().replaceAll(' ', '-') === name.toLowerCase()) {
+                    launchDate = row.Launch_Date;
+                    launchState = row.LVState;
+                }
+            }            );
             // console.log(`NOAA: ${name}, ${launchDate}`);
             break;
         case ctx.SAT_GROUP.GEODETIC:
             name = rawName.split("(")[0].replaceAll(/ 1$/g, "").replaceAll("COSMOS", "Kosmos").trim().replaceAll(" ", "-");
-            launchDate = ctx.LAUNCHLOG.DATA.find(row => row.Name.toLowerCase().replaceAll(" ", "-") === name.toLowerCase())?.Launch_Date;
+            ctx.LAUNCHLOG.DATA.find(row =>{
+                if(row.Name.toLowerCase().replaceAll(" ", "-") === name.toLowerCase()){
+                    launchDate = row.Launch_Date;
+                    launchState = row.LVState;
+                }
+            });
             break;
         default:
             console.error(`Invalid satellite group: ${satGroup}`);
             break;
     }
-    if (!launchDate) console.warn(`Geodetic: ${rawName} --> ${name}, ${launchDate}`);
-    return [name, launchDate];
+    if (!launchDate || !launchState) console.warn(`Geodetic: ${rawName} --> ${name}, ${launchDate}, ${launchState}`);
+    return [name, launchDate, launchState];
 }
