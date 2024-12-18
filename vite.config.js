@@ -11,11 +11,11 @@ export default defineConfig({
         },
     },
     define: {
-        CESIUM_BASE_URL: JSON.stringify('/'),
+        CESIUM_BASE_URL: JSON.stringify('/cesium/'),
     },
     plugins: [cesium()],
     optimizeDeps: {
-        include: ["cesium"],
+        include: ["cesium", "d3", "bootstrap"],
     },
     publicDir: "public",
     server: {
@@ -27,5 +27,5 @@ export default defineConfig({
         host: "127.0.0.1",
         port: 4170,
         strictPort: true,
-    }
+    },
 });

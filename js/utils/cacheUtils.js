@@ -26,11 +26,6 @@ export const dbPromise = new Promise((resolve, reject) => {
     };
 });
 
-/**
- * Retrieves the object store with the specified mode.
- * @param {string} mode - The transaction mode ('readonly' or 'readwrite').
- * @returns {Promise<IDBObjectStore>} - A promise that resolves to the object store.
- */
 export function getObjectStore(mode = "readonly") {
     return dbPromise.then((db) => {
         const tx = db.transaction("cache", mode);
@@ -38,12 +33,8 @@ export function getObjectStore(mode = "readonly") {
     });
 }
 
-/**
- * Checks if the cache entry with the given key is still valid.
- * @param {string} cacheKey - The key of the cache entry.
- * @returns {Promise<boolean>} - A promise that resolves to true if valid, false otherwise.
- */
 export async function isCacheValid(cacheKey) {
+    // return false; // debug line
     if (cacheKey === undefined) return false;
     try {
         const store = await getObjectStore("readonly");
@@ -61,13 +52,6 @@ export async function isCacheValid(cacheKey) {
     }
 }
 
-/**
- * Saves data to the cache with the specified key and duration.
- * @param {string} cacheKey - The key for the cache entry.
- * @param {*} data - The data to be cached.
- * @param {number} [duration=ctx.CACHE_DURATION] - The duration in milliseconds for which the cache is valid.
- * @returns {Promise<boolean>} - A promise that resolves to true if saved successfully, false otherwise.
- */
 export async function saveToCache(cacheKey, data, duration = ctx.CACHE_DURATION) {
     if (cacheKey === undefined) return false;
     try {
@@ -87,11 +71,6 @@ export async function saveToCache(cacheKey, data, duration = ctx.CACHE_DURATION)
     }
 }
 
-/**
- * Retrieves cached data for the given key.
- * @param {string} cacheKey - The key of the cache entry.
- * @returns {Promise<*>} - A promise that resolves to the cached data or null if not found.
- */
 export async function getCachedData(cacheKey) {
     if (cacheKey === undefined) return null;
     try {

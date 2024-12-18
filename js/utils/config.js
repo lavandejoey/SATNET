@@ -23,8 +23,8 @@ export const ctx = {
         URL: "/data/launchlog.tsv", // Configurable via environment if needed
         DATA: null, // To be populated with launch log data
     },
-    COUNTRY:{
-        NAME:"Country",
+    COUNTRY: {
+        NAME: "Country",
         CACHE_KEY: "country_cache",
         URL: "/data/country.tsv",
         DATA: null,
@@ -50,6 +50,17 @@ export const ctx = {
             SELECTED: true,
         },
         /******************************************* Navigation Satellites *******************************************/
+        GPS: {
+            NAME: "GPS Operational",
+            CATEGORY: "Navigation",
+            COLOR: Cesium.Color.LIGHTGREEN,
+            CACHE_KEY: "gps_tle_cache",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=gps-ops&FORMAT=tle",
+            URL: "/data/tle/GPSTLE.txt",
+            DATA: null,
+            ENTITY: [],
+            SELECTED: true,
+        },
         BEIDOU: {
             NAME: "Beidou",
             CATEGORY: "Navigation",
@@ -89,7 +100,8 @@ export const ctx = {
             NAME: "Geodetic",
             CATEGORY: "Scientific",
             COLOR: Cesium.Color.PURPLE,
-            // CACHE_KEY: "geodetic_tle_cache",
+            CACHE_KEY: "geodetic_tle_cache",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=geodetic&FORMAT=tle",
             URL: "/data/tle/GeodeticTLE.txt",
             DATA: null,
             ENTITY: [],
