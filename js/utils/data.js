@@ -9,6 +9,37 @@ import {EARTH_RADIUS_METERS, ORBIT_TYPES} from "/js/utils/constants.js";
 // Keep col: #Launch_Tag, Launch_Date, Piece, Name, PLName, SatOwner, SatState, Launch_Site
 const REQUIRED_COLUMNS = ["#Launch_Tag", "Launch_Date", "Piece", "Name", "PLName", "SatOwner", "SatState", "Launch_Site", "LVState"];
 const SITE_REQUIRED_COLUMNS = ["#Site", "Longitude", "Latitude"];
+const stateCode = {
+    "US": "United States",
+    "CN": "China",
+    "IN": "India",
+    "UK": "United Kingdom",
+    "RU": "Russian Federation",
+    "UY": "Uruguay",
+    "CA": "Canada",
+    "I": "Italy",
+    "I-EU": "Italy",
+    "I-ESA": "Italy",
+    "F": 'France',
+    "J": "Japan",
+    "D": "Germany",
+    "KR": "South Korea",
+    "E": "Spain",
+    "L": "Luxembourg"
+}
+
+export function dataUpdate(data, currentDate) {
+    const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
+    const filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
+
+    ctx.NUM_SC = Object.fromEntries(
+        d3.group(filteredData, d => d.SatState)
+            .entries() // 将 group 转为可迭代的 [key, values] 数组
+            .map(([key, values]) => [key, values.length]) // 构造 [key, value] 的键值对
+    );
+    
+    return;
+}
 
 function parseStringDate(rawDatetime) {
     rawDatetime = rawDatetime.replaceAll('?', '').slice(0, 16);
@@ -72,6 +103,7 @@ export async function loadSites() {
 export async function loadCountry() {
     if (await isCacheValid(ctx.COUNTRY.CACHE_KEY)) {
         const cachedData = await getCachedData(ctx.COUNTRY.CACHE_KEY);
+        ctx.COUNTRY.DATA = cachedData;
         console.log("Fetched country data from cache");
         return;
     }
@@ -83,15 +115,17 @@ export async function loadCountry() {
         }));
 
         ctx.COUNTRY.DATA = parsedData.reduce((acc, site) => {
-            const country = site["SatelliteState"].trim();
-            const longitude = parseFloat(site["Longitude"]);
-            const latitude = parseFloat(site["Latitude"]);
+            const country = site["SatelliteState"].trim(); 
+            const longitude = parseFloat(site["Longitude"]); 
+            const latitude = parseFloat(site["Latitude"]); 
 
-            acc[country] = {Longitude: longitude, Latitude: latitude};
+            acc[country] = { Longitude: longitude, Latitude: latitude };
+            // ctx.NUM_SC[country] = 0;
             return acc;
         }, {});
+        console.log("Fetched country data from server");
 
-        saveToCache(ctx.COUNTRY.CACHE_KEY, ctx.COUNTRY.DATA, ctx.CACHE_DURATION).then(() => console.log("Fetched country data from server"));
+        saveToCache(ctx.COUNTRY.CACHE_KEY, ctx.COUNTRY.DATA, ctx.CACHE_DURATION).then(() => console.log("Saved launch log data to cache"));
 
         return ctx.COUNTRY.DATA;
     } catch (error) {
