@@ -67,7 +67,7 @@ export function addSatelliteGroupOptions() {
     // Create and add a "Select All" option
     const selectAllOption = document.createElement("div");
     selectAllOption.classList.add("option-item", "selected", "w-100", "p-1");
-    selectAllOption.textContent = "Select All";
+    selectAllOption.textContent = "Hide All";
     selectAllOption.style.cursor = "pointer";
     selectAllOption.style.textAlign = "center";
     selectAllOption.style.userSelect = "none";
@@ -112,11 +112,13 @@ export function addSatelliteGroupOptions() {
     selectAllOption.addEventListener("click", () => {
         const shouldSelectAll = !selectAllOption.classList.contains("selected");
 
-        // Toggle "Select All" state
+        // Change to "Select All" or "Deselect All" based on the current state of selectAllOption
         if (shouldSelectAll) {
+            selectAllOption.textContent = "Hide All";
             selectAllOption.classList.add("selected");
             selectAllOption.classList.remove("unselected");
         } else {
+            selectAllOption.textContent = "Show All";
             selectAllOption.classList.add("unselected");
             selectAllOption.classList.remove("selected");
         }

@@ -46,5 +46,4 @@ async function loadViz() {
     display2DSatellites();
 }
 
-// load page or resize page -> reload the viewer
-window.addEventListener('load', loadViz);
+window.onload = loadViz;

@@ -79,7 +79,7 @@ function changeTime(data) {
 function updateBarPlot(data, currentDate) {
     try {
         const currentDiv = document.getElementById("vmagHist");
-        console.log(currentDiv.offsetWidth, currentDiv.offsetHeight)
+        // console.log(currentDiv.offsetWidth, currentDiv.offsetHeight)
         const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
         const filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
 
