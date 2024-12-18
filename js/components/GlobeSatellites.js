@@ -3,7 +3,7 @@ import * as satellite from "satellite.js";
 import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
 import {loadOrbitsTLEDate} from "/js/utils/data";
-import {ORBIT_TYPES} from "../utils/constants.js";
+import {ORBIT_TYPES} from "/js/utils/constants.js";
 
 export function handleSatelliteClick() {
     function clearSelection() {

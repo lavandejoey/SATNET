@@ -3,7 +3,7 @@ import * as Cesium from "cesium";
 import "/node_modules/cesium/Build/Cesium/Widgets/widgets.css";
 import {CESIUM_ACCESS_TOKEN, CESIUM_3D_CONFIG, ctx, ionImageryProvider} from "/js/utils/config";
 import {initCamera, INITIAL_CAMERA_3D} from "/js/utils/camera";
-import {handleSatelliteClick} from "./GlobeSatellites";
+import {handleSatelliteClick} from "/js/components/GlobeSatellites";
 
 Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 

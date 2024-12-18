@@ -1,10 +1,10 @@
-import {ctx} from "./config.js";
+import {ctx} from "/js/utils/config.js";
 
 async function loadPage() {
     const loadingInfo = document.getElementById('loadingInfo');
 
     if (loadingInfo) loadingInfo.innerHTML = "Loading Globe and Map Viewers 1/4";
-    // Once both are loaded and we have ctx.view3D and ctx.view2D not null, hide the loading overlay
+    // Once both are loaded, and we have ctx.view3D and ctx.view2D not null, hide the loading overlay
     while (ctx.view2D === null || ctx.view3D === null) {
         await new Promise(resolve => setTimeout(resolve, 100));
     }

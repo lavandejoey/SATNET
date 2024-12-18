@@ -25,13 +25,13 @@ export const ORBIT_TYPES = {
         id: "MEO",
         name: "Medium Earth Orbit (MEO)",
         minAltitude: 2000e3, // >=2000 km
-        maxAltitude: 3000e4, // <30000 km
+        maxAltitude: 3500e4, // <35000 km
         period: 360 // Period in minutes (6 hours)
     },
     GEO: {
         id: "GEO",
         name: "Geostationary Orbit (GEO)",
-        minAltitude: 3000e4, // >=30000 km
+        minAltitude: 3500e4, // >=35000 km
         maxAltitude: 3600e4, // <36000 km
         period: 1440 // Period in minutes (24 hours)
     },

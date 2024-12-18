@@ -1,7 +1,7 @@
 // js/components/widgets.js
 import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
-import {initCamera, INITIAL_CAMERA_3D} from "../utils/camera";
+import {initCamera, INITIAL_CAMERA_3D} from "/js/utils/camera";
 
 export async function addWidgets() {
     setWatermark();

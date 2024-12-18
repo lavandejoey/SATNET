@@ -10,7 +10,7 @@ import {displaySatellites} from "/js/components/GlobeSatellites";
 import {display2DSatellites} from "/js/components/MapSatellites";
 import {createStatViz} from "/js/components/StatMap";
 import {loadLaunchLog, loadSites} from "/js/utils/data";
-import {loadPage} from "./utils/loadPage.js";
+import {loadPage} from "/js/utils/loadPage.js";
 import {ctx} from "/js/utils/config";
 
 async function loadViz() {
