@@ -112,8 +112,8 @@
     "iso2Code": "IL"
   },
   "L": {
-    "fullName": "Unknown",
-    "iso2Code": null
+    "fullName": "Luxembourg",
+    "iso2Code": "LU"
   },
   "AR": {
     "fullName": "Argentina",
@@ -129,11 +129,11 @@
   },
   "I-INM": {
     "fullName": "International Nuclear Management",
-    "iso2Code": null
+    "iso2Code": "UN"
   },
   "CSFR": {
     "fullName": "Czechoslovakia",
-    "iso2Code": null
+    "iso2Code": "XX"
   },
   "KR": {
     "fullName": "South Korea",
@@ -245,7 +245,7 @@
   },
   "I-RASC": {
     "fullName": "Royal Astronomical Society of Canada",
-    "iso2Code": null
+    "iso2Code": "CA"
   },
   "VN": {
     "fullName": "Vietnam",
