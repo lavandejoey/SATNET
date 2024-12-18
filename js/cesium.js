@@ -11,7 +11,7 @@ import {displaySatellites} from "/js/components/GlobeSatellites";
 import {display2DSatellites} from "/js/components/MapSatellites";
 import { display2DCountry } from "/js/components/MapCountry";
 import {createStatViz} from "/js/components/StatMap";
-import {loadLaunchLog, loadSites, loadCountry} from "/js/utils/data";
+import {loadLaunchLog, loadSites, loadCountry, dataUpdate} from "/js/utils/data";
 import {loadPage} from "/js/utils/loadPage";
 import {ctx} from "/js/utils/config";
 

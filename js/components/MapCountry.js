@@ -19,19 +19,19 @@ function changeTime(data) {
 }
 
 function update2DCountry(num_sc){
-    currentEntities.removeAll();
+    ctx.currentSiteEntity.removeAll();
     const country_loc = ctx.COUNTRY.DATA;
     for (var key in num_sc) {
         var loc = country_loc[key];
         const launchRadiusEntity = createSatelliteRadiusEntity(loc, newData[key]);
         if (launchRadiusEntity){
-            var entity_id = currentEntities.add(launchRadiusEntity);
+            var entity_id = ctx.currentSiteEntity.add(launchRadiusEntity);
         }
     }
     // console
 }
 
-function init2DCountry(currentEntities){
+function init2DCountry(){
     ctx.view3D.clock.onTick.addEventListener(() => {
         // Load the satellite
         const currentTime = Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime); 
@@ -43,7 +43,7 @@ function init2DCountry(currentEntities){
                 const launchRadiusEntity = createSatelliteRadiusEntity(loc, launchDate, lifespan);
                 // 5seconds remove the point
                 if (launchRadiusEntity){
-                    var entity_id = currentEntities.add(launchRadiusEntity);
+                    var entity_id = ctx.currentSiteEntity.add(launchRadiusEntity);
                 }
             }
         });
@@ -52,10 +52,10 @@ function init2DCountry(currentEntities){
 
 export function display2DCountry() {
     try {
-        const currentEntities = ctx.view2D.entities;
-        currentEntities.removeAll();
+        // const currentEntities = ctx.view2D.entities;
+        ctx.currentSiteEntity.removeAll();
         
-        // init2DCountry(currentEntities);
+        // init2DCountry();
         setInterval(() => {
             var currentDate = Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime);
             update2DCountry(ctx.NUM_SC);

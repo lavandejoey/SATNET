@@ -16,6 +16,7 @@ export const ctx = {
 
     currentSatelliteEntity: null, // Current satellite entity
     currentOrbitEntity: null, // Current orbit entity
+    currentSiteEntity: null, // Current site entity
 
     LAUNCHLOG: {
         NAME: "LaunchLog",
