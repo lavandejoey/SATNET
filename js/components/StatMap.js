@@ -17,15 +17,16 @@ const COLOURS = {
     BUTTON_ACTIVE: "steelblue",
     BAR_FILL: "steelblue",
     LINE_STROKE: "steelblue",
-    starrySkyColorsArray: ["#2E3A87", "#E5E5E5", "#9B4F96", "#F1C6D1", "#1B4F6C", "#4F9AC8", "#D9A8D3", "#D9F2FF"]
+    countryColorMap: { "US": "#2E3A87", "CN": "#E5E5E5", "UK": "#9B4F96", "RU": "#F1C6D1" },
+    starrySkyColorsArray: ["#1B4F6C", "#4F9AC8", "#D9A8D3", "#D9F2FF"]
 };
 
 const stateCode = {
     "US": "United States",
     "CN": "China",
-    "IN": "India",
     "UK": "United Kingdom",
     "RU": "Russian Federation",
+    "IN": "India",
     "UY": "Uruguay",
     "CA": "Canada",
     "I": "Italy",
@@ -36,7 +37,8 @@ const stateCode = {
     "D": "Germany",
     "KR": "South Korea",
     "E": "Spain",
-    "L": "Luxembourg"
+    "L": "Luxembourg",
+    "SG": "Singapore"
 }
 
 const countryFlags = {
@@ -49,18 +51,24 @@ const countryFlags = {
     "CA": "/img/flags/CA.png",
     "I": "/img/flags/I.png",
     "I-EU": "/img/flags/I.png",
+    "I-ESA": "/img/flags/I.png",
     "F": "/img/flags/F.png",
     "J": "/img/flags/J.png",
     "D": "/img/flags/D.png",
     "KR": "/img/flags/KR.png",
     "E": "/img/flags/E.png",
     "L": "/img/flags/L.png",
+    "SG": "/img/flags/SG.png",
 }
 
 const colorScale = d3.scaleOrdinal(COLOURS.starrySkyColorsArray);
 
 let svgBar, xBar, yBar, plotType = "Country";
 let svgLine, xLine, yLine;
+const buttonWidth = 80;
+const buttonHeight = 20;
+const buttonSpacing = 10;
+let selectedCountry = [];
 
 // Utility function to debounce events
 function debounce(func, wait) {
@@ -79,33 +87,102 @@ function changeTime(data) {
 function updateBarPlot(data, currentDate) {
     try {
         const currentDiv = document.getElementById("vmagHist");
-        console.log(currentDiv.offsetWidth, currentDiv.offsetHeight)
+        // console.log(currentDiv.offsetWidth, currentDiv.offsetHeight)
         const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
         const filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
 
         let currentYear = currentDate.getFullYear()
         let totalCount = filteredData.length;
+        // if (plotType === "Agent") {
+        //     // Create filter buttons
+        //     let svgContainer =  d3.select("#mySvgContainer");
+        //     const filterBar = svgContainer.append("g")
+        //         .attr("transform", `translate(${margin.left},${margin.top - buttonHeight * 4 - 20})`);
+
+        //     const filter_buttons = [
+        //         { id: "US", label: "US" },
+        //         { id: "CN", label: "CN" },
+        //         { id: "RU", label: "RU" },
+        //         { id: "UK", label: "UK" },
+        //         { id: "Others", label: "Others"}
+        //     ];
+
+
+        //     const filterGroups = filterBar.selectAll(".filter-group")
+        //         .data(filter_buttons)
+        //         .enter()
+        //         .append("g")
+        //         .attr("class", "filter-group")
+        //         .attr("transform", (d, i) => `translate(0, ${i * (buttonHeight + buttonSpacing)})`);
+
+        //     filterGroups.append("rect")
+        //         .attr("class", "filter-bg")
+        //         .attr("width", buttonWidth)
+        //         .attr("height", buttonHeight)
+        //         .attr("rx", 5)
+        //         .attr("ry", 5)
+        //         .style("fill", d => selectedCountry.includes(d.id) ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG)
+        //         .style("cursor", "pointer")
+        //         .on("click", function (event, d) {
+        //             const index = selectedCountry.indexOf(d.id);
+
+        //             if (index > -1) {
+        //                 selectedCountry.splice(index, 1); 
+        //             } else {
+        //                 selectedCountry.push(d.id); 
+        //             }
+        
+        //             // 更新按钮颜色
+        //             d3.selectAll(".filter-bg")
+        //                 .style("fill", btn => selectedCountry.includes(btn.id) ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG);
+        
+        //             // filter data
+        //             // updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
+        //         });
+
+        //     filterGroups.append("text")
+        //         .attr("x", buttonWidth / 2)
+        //         .attr("y", buttonHeight / 2)
+        //         .attr("dy", "0.35em")
+        //         .attr("text-anchor", "middle")
+        //         .text(d => d.label)
+        //         .style("font-size", "12px")
+        //         .style("cursor", "pointer");
+        // }
 
 
         let stateCount;
         if (plotType === "Country") {
             stateCount = Array.from(d3.group(filteredData, d => d.SatState), ([key, values]) => ({
                 key,
-                value: values.length
+                value: values.length,
+                satStates: key
             }));
         } else if (plotType === "Agent") {
             stateCount = Array.from(d3.group(filteredData, d => d.SatOwner), ([key, values]) => ({
                 key,
-                value: values.length
+                value: values.length,
+                satStates: Array.from(new Set(values.map(v => v.SatState)))
             }));
         }
 
         stateCount.sort((a, b) => b.value - a.value);
-        stateCount = stateCount.slice(0, 5);
+        stateCount = stateCount.slice(0, 10);
+        // console.log(stateCount)
+
+        const valueExtent = d3.extent(stateCount, d => d.value);
+        // const logScale = d3.scaleLog().base(2).domain([Math.max(1, valueExtent[0]), valueExtent[1]]);
+        const logScale = d3.scaleLog().base(2).domain([1, valueExtent[1]]);
+
+        // add log value for stateCount
+        stateCount = stateCount.map(d => ({
+            ...d,
+            logValue: logScale(d.value) 
+        }));
 
 
         /*Update scales*/
-        xBar.domain([0, d3.max(stateCount, d => d.value)]).nice();
+        xBar.domain([0, d3.max(stateCount, d => d.logValue)]).nice();
         yBar.domain(stateCount.map(d => d.key));
 
         // Update axes
@@ -134,9 +211,10 @@ function updateBarPlot(data, currentDate) {
         bars.transition().duration(500)
             .attr("y", d => yBar(d.key))
             .attr("height", yBar.bandwidth())
-            .attr("width", d => xBar(d.value));
+            .attr("width", d => xBar(d.logValue));
 
         // Enter new bars
+
         bars.enter()
             .append("rect")
             .attr("class", "bar")
@@ -144,14 +222,14 @@ function updateBarPlot(data, currentDate) {
             .attr("height", yBar.bandwidth())
             .attr("x", 0)
             .attr("width", 0)
-            .style("fill", d => colorScale(d.key))
+            .style("fill", d => COLOURS.countryColorMap[d.satStates] || colorScale(d.satStates))
             .on("mouseover", function (event, d) {
                 d3.select(this)
                     .append("title")
                     .text(() => stateCode[d.key] || d.key); // Use dictionary for full name
             })
             .transition().duration(500)
-            .attr("width", d => xBar(d.value));
+            .attr("width", d => xBar(d.logValue));
 
 
         // Remove exiting bars
@@ -161,15 +239,13 @@ function updateBarPlot(data, currentDate) {
             .remove();
 
         /*Update labels*/
-
-
         // Add labels to each bar
         const labels = svgBar.selectAll(".label")
             .data(stateCount, d => d.key);
 
         // Update existing labels
         labels.transition().duration(500)
-            .attr("x", d => xBar(d.value) / 2 - 5) // Position slightly to the right of the bar
+            .attr("x", d => xBar(d.logValue) / 2 - 5) // Position slightly to the right of the bar
             .attr("y", d => yBar(d.key) + yBar.bandwidth() / 2) // Vertically center the label
             .text(d => d.value); // Update the text with the current value
 
@@ -177,7 +253,7 @@ function updateBarPlot(data, currentDate) {
         labels.enter()
             .append("text")
             .attr("class", "label")
-            .attr("x", d => xBar(d.value) / 2 - 5) // Position slightly to the right of the bar
+            .attr("x", d => xBar(d.logValue) / 2 - 5) // Position slightly to the right of the bar
             .attr("y", d => yBar(d.key) + yBar.bandwidth() / 2) // Vertically center the label
             .attr("dy", "0.35em") // Offset to align vertically with the bar
             .style("font-size", "12px")
@@ -193,12 +269,12 @@ function updateBarPlot(data, currentDate) {
         if (plotType === "Country") {
 
             /* Update right-bottom display */
-            svgBar.selectAll(".dynamic-text").remove(); // 移除旧的文本
+            svgBar.selectAll(".dynamic-text").remove();
 
-            // 添加年份 (currentYear)
+            //  (currentYear)
             svgBar.append("text")
                 .attr("class", "dynamic-text year-text")
-                .attr("x", currentDiv.offsetWidth -margin.bottom*4) // 右边对齐，使用容器宽度
+                .attr("x", currentDiv.offsetWidth - margin.bottom * 4) // 右边对齐，使用容器宽度
                 .attr("y", currentDiv.offsetHeight / 2) // 距离底部稍远
                 .attr("text-anchor", "end") // 右对齐
                 .style("fill", "lightgray")
@@ -206,19 +282,19 @@ function updateBarPlot(data, currentDate) {
                 .style("font-weight", "bold")
                 .text(`${currentYear}`);
 
-            // 添加总条数 (totalCount)
+            //  (totalCount)
             svgBar.append("text")
                 .attr("class", "dynamic-text count-text")
-                .attr("x", currentDiv.offsetWidth -margin.bottom*4) // 右边对齐，使用容器宽度
+                .attr("x", currentDiv.offsetWidth - margin.bottom * 4) // 右边对齐，使用容器宽度
                 .attr("y", currentDiv.offsetHeight / 2 + margin.bottom) // 更靠近底部
                 .attr("text-anchor", "end") // 右对齐
                 .style("fill", "lightgray")
                 .style("font-size", "20px") // 较小字体
-                .text(`Count: ${totalCount}`);
+                .text(`Total: ${totalCount}`);
 
             // Update existing images
             imgs.transition().duration(500)
-                .attr("x", d => xBar(d.value) + 10) // Adjust position slightly to the right of the bar
+                .attr("x", d => xBar(d.logValue) + 10) // Adjust position slightly to the right of the bar
                 .attr("y", d => yBar(d.key)) // Vertically center the flag image
                 .attr("width", yBar.bandwidth()) // Set the flag width
                 .attr("height", yBar.bandwidth()) // Set the flag height
@@ -228,7 +304,7 @@ function updateBarPlot(data, currentDate) {
             imgs.enter()
                 .append("image")
                 .attr("class", "countryImg")
-                .attr("x", d => xBar(d.value) + 10) // Position to the right of the bar
+                .attr("x", d => xBar(d.logValue) + 10) // Position to the right of the bar
                 .attr("y", d => yBar(d.key)) // Vertically center the image
                 .attr("width", yBar.bandwidth()) // Set the flag width
                 .attr("height", yBar.bandwidth()) // Set the flag height
@@ -238,6 +314,8 @@ function updateBarPlot(data, currentDate) {
             imgs.exit().remove();
         } else {
             imgs.exit().remove();
+            svgBar.selectAll(".dynamic-text").remove();
+
 
         }
     } catch (error) {
@@ -258,6 +336,7 @@ function initBarPlot() {
         // Create SVG container
         const svgContainer = d3.select("#vmagHist")
             .append("svg")
+            .attr("id", "mySvgContainer")
             .attr("width", currentWidth)
             .attr("height", currentHeight);
 
@@ -285,9 +364,7 @@ function initBarPlot() {
             { id: "button-agent", label: "Agent" }
         ];
 
-        const buttonWidth = 80;
-        const buttonHeight = 20;
-        const buttonSpacing = 10;
+
 
         const buttonGroups = toggleBar.selectAll(".button-group")
             .data(buttons)
@@ -308,6 +385,9 @@ function initBarPlot() {
                 plotType = d.label;
                 d3.selectAll(".button-bg").style("fill", COLOURS.BUTTON_BG);
                 d3.select(this).style("fill", COLOURS.BUTTON_ACTIVE);
+                // if (plotType === "Country"){
+
+                // }
                 updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
             });
 
@@ -319,6 +399,7 @@ function initBarPlot() {
             .text(d => d.label)
             .style("font-size", "12px")
             .style("cursor", "pointer");
+
     } catch (error) {
         console.error("Error initializing bar plot:", error);
     }
