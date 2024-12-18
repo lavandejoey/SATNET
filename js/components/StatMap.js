@@ -65,10 +65,11 @@ const colorScale = d3.scaleOrdinal(COLOURS.starrySkyColorsArray);
 
 let svgBar, xBar, yBar, plotType = "Country";
 let svgLine, xLine, yLine;
-const buttonWidth = 80;
-const buttonHeight = 20;
-const buttonSpacing = 10;
-let selectedCountry = [];
+const buttonWidth = 120;
+const buttonHeight = 40;
+const buttonSpacing = 30;
+let nonselectedCountry = [];
+// const majorCountry = ["US", "CN","UK", "RU"];
 
 // Utility function to debounce events
 function debounce(func, wait) {
@@ -87,68 +88,18 @@ function changeTime(data) {
 function updateBarPlot(data, currentDate) {
     try {
         const currentDiv = document.getElementById("vmagHist");
-        // console.log(currentDiv.offsetWidth, currentDiv.offsetHeight)
         const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
-        const filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
+        // let filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
+        // filteredData = filteredData.filter(d => !selectedCountry.includes(d.SatState));
+        let filteredData = data.filter(d => 
+            d.Launch_Date >= oneYearAgo && 
+            d.Launch_Date <= currentDate &&
+            !nonselectedCountry.includes(d.SatState) 
+        );
+        
 
         let currentYear = currentDate.getFullYear()
         let totalCount = filteredData.length;
-        // if (plotType === "Agent") {
-        //     // Create filter buttons
-        //     let svgContainer =  d3.select("#mySvgContainer");
-        //     const filterBar = svgContainer.append("g")
-        //         .attr("transform", `translate(${margin.left},${margin.top - buttonHeight * 4 - 20})`);
-
-        //     const filter_buttons = [
-        //         { id: "US", label: "US" },
-        //         { id: "CN", label: "CN" },
-        //         { id: "RU", label: "RU" },
-        //         { id: "UK", label: "UK" },
-        //         { id: "Others", label: "Others"}
-        //     ];
-
-
-        //     const filterGroups = filterBar.selectAll(".filter-group")
-        //         .data(filter_buttons)
-        //         .enter()
-        //         .append("g")
-        //         .attr("class", "filter-group")
-        //         .attr("transform", (d, i) => `translate(0, ${i * (buttonHeight + buttonSpacing)})`);
-
-        //     filterGroups.append("rect")
-        //         .attr("class", "filter-bg")
-        //         .attr("width", buttonWidth)
-        //         .attr("height", buttonHeight)
-        //         .attr("rx", 5)
-        //         .attr("ry", 5)
-        //         .style("fill", d => selectedCountry.includes(d.id) ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG)
-        //         .style("cursor", "pointer")
-        //         .on("click", function (event, d) {
-        //             const index = selectedCountry.indexOf(d.id);
-
-        //             if (index > -1) {
-        //                 selectedCountry.splice(index, 1); 
-        //             } else {
-        //                 selectedCountry.push(d.id); 
-        //             }
-        
-        //             // 更新按钮颜色
-        //             d3.selectAll(".filter-bg")
-        //                 .style("fill", btn => selectedCountry.includes(btn.id) ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG);
-        
-        //             // filter data
-        //             // updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
-        //         });
-
-        //     filterGroups.append("text")
-        //         .attr("x", buttonWidth / 2)
-        //         .attr("y", buttonHeight / 2)
-        //         .attr("dy", "0.35em")
-        //         .attr("text-anchor", "middle")
-        //         .text(d => d.label)
-        //         .style("font-size", "12px")
-        //         .style("cursor", "pointer");
-        // }
 
 
         let stateCount;
@@ -167,12 +118,11 @@ function updateBarPlot(data, currentDate) {
         }
 
         stateCount.sort((a, b) => b.value - a.value);
-        stateCount = stateCount.slice(0, 10);
+        stateCount = stateCount.slice(0, 15);
         // console.log(stateCount)
 
         const valueExtent = d3.extent(stateCount, d => d.value);
-        // const logScale = d3.scaleLog().base(2).domain([Math.max(1, valueExtent[0]), valueExtent[1]]);
-        const logScale = d3.scaleLog().base(2).domain([1, valueExtent[1]]);
+        const logScale = d3.scaleLog().base(2).domain([0.5, valueExtent[1]]);
 
         // add log value for stateCount
         stateCount = stateCount.map(d => ({
@@ -274,22 +224,22 @@ function updateBarPlot(data, currentDate) {
             //  (currentYear)
             svgBar.append("text")
                 .attr("class", "dynamic-text year-text")
-                .attr("x", currentDiv.offsetWidth - margin.bottom * 4) // 右边对齐，使用容器宽度
-                .attr("y", currentDiv.offsetHeight / 2) // 距离底部稍远
-                .attr("text-anchor", "end") // 右对齐
+                .attr("x", currentDiv.offsetWidth - margin.bottom * 4) 
+                .attr("y", currentDiv.offsetHeight / 2) 
+                .attr("text-anchor", "end") 
                 .style("fill", "lightgray")
-                .style("font-size", "32px") // 大字体
+                .style("font-size", "32px") 
                 .style("font-weight", "bold")
                 .text(`${currentYear}`);
 
             //  (totalCount)
             svgBar.append("text")
                 .attr("class", "dynamic-text count-text")
-                .attr("x", currentDiv.offsetWidth - margin.bottom * 4) // 右边对齐，使用容器宽度
-                .attr("y", currentDiv.offsetHeight / 2 + margin.bottom) // 更靠近底部
-                .attr("text-anchor", "end") // 右对齐
+                .attr("x", currentDiv.offsetWidth - margin.bottom * 4) 
+                .attr("y", currentDiv.offsetHeight / 2 + margin.bottom) 
+                .attr("text-anchor", "end") 
                 .style("fill", "lightgray")
-                .style("font-size", "20px") // 较小字体
+                .style("font-size", "20px") 
                 .text(`Total: ${totalCount}`);
 
             // Update existing images
@@ -331,7 +281,7 @@ function initBarPlot() {
         const { clientWidth: currentWidth, clientHeight: currentHeight } = vmagHistDiv;
 
         const width = currentWidth - margin.left - margin.right;
-        const height = currentHeight - margin.top - margin.bottom;
+        const height = currentHeight - margin.top*2 - margin.bottom*2;
 
         // Create SVG container
         const svgContainer = d3.select("#vmagHist")
@@ -341,7 +291,7 @@ function initBarPlot() {
             .attr("height", currentHeight);
 
         svgBar = svgContainer.append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
+            .attr("transform", `translate(${margin.left},${margin.top*2})`);
 
         // Define scales
         xBar = d3.scaleLinear().range([0, width]);
@@ -400,6 +350,60 @@ function initBarPlot() {
             .style("font-size", "12px")
             .style("cursor", "pointer");
 
+            // Create filter buttons
+            const filterBar = svgContainer.append("g")
+                .attr("transform", `translate(${margin.left},${currentHeight - buttonHeight - 20})`);
+
+            const filter_buttons = [
+                { id: "US", label: "US" },
+                { id: "CN", label: "CN" },
+                { id: "RU", label: "RU" },
+                { id: "UK", label: "UK" },
+            ];
+
+            const filterGroups = filterBar.selectAll(".filter-group")
+                .data(filter_buttons)
+                .enter()
+                .append("g")
+                .attr("class", "filter-group")
+                .attr("transform", (d, i) => `translate(${i * (buttonWidth + buttonSpacing)}, 0)`);
+
+            filterGroups.append("rect")
+                .attr("class", "filter-bg")
+                .attr("width", buttonWidth)
+                .attr("height", buttonHeight)
+                .attr("rx", 5)
+                .attr("ry", 5)
+                .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.countryColorMap[d.id] : COLOURS.BUTTON_BG)
+                // .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG)
+                .style("cursor", "pointer")
+                .on("click", function (event, d) {
+                    const index = nonselectedCountry.indexOf(d.id);
+
+                    if (index > -1) {
+                        nonselectedCountry.splice(index, 1); 
+                    } else {
+                        nonselectedCountry.push(d.id); 
+                    }
+
+                    d3.selectAll(".filter-bg")
+                        // .style("fill", btn => nonselectedCountry.includes(btn.id) ? COLOURS.BUTTON_BG : COLOURS.BUTTON_ACTIVE);
+                        .style("fill", btn => !nonselectedCountry.includes(btn.id) ? COLOURS.countryColorMap[btn.id] :  COLOURS.BUTTON_BG);
+        
+                    // filter data
+                    updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
+                    console.log(nonselectedCountry)
+                });
+
+            filterGroups.append("text")
+                .attr("x", buttonWidth / 2)
+                .attr("y", buttonHeight / 2)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "middle")
+                .text(d => d.label)
+                .style("font-size", "12px")
+                .style("cursor", "pointer");
+
     } catch (error) {
         console.error("Error initializing bar plot:", error);
     }
@@ -434,13 +438,34 @@ function initLineChart() {
             value: values.length
         })).sort((a, b) => a.year - b.year);
 
+        const logScale = d3.scaleLog()
+        .base(10)
+        .domain([1, d3.max(yearCount, d => d.value)])  
+
+        const cumulativeYearCount = [];
+        let cumulativeValue = 0;
+
+        yearCount.forEach(d => {
+        cumulativeValue += d.value;  
+
+        const logCumulativeValue = cumulativeValue > 0 ? logScale(cumulativeValue) : 0;  
+
+        cumulativeYearCount.push({
+            year: d.year,
+            cumulativeValue: logCumulativeValue  
+        });
+        });
+
+        // console.log(cumulativeYearCount);
+
+
         // Define scales
         xLine = d3.scaleLinear()
-            .domain(d3.extent(yearCount, d => d.year))
+            .domain(d3.extent(cumulativeYearCount, d => d.year))
             .range([0, width]);
 
         yLine = d3.scaleLinear()
-            .domain([0, d3.max(yearCount, d => d.value)])
+            .domain([0, d3.max(cumulativeYearCount, d => d.cumulativeValue)])
             .range([height, 0]);
 
         // Append axes
@@ -463,11 +488,11 @@ function initLineChart() {
         // Define line generator
         const line = d3.line()
             .x(d => xLine(d.year))
-            .y(d => yLine(d.value));
+            .y(d => yLine(d.cumulativeValue));
 
         // Append line path
         svgLine.append("path")
-            .datum(yearCount)
+            .datum(cumulativeYearCount)
             .attr("fill", "none")
             .attr("stroke", "white")
             .attr("stroke-width", 2)
@@ -489,7 +514,7 @@ export function createStatViz() {
         const vmagHistDiv = document.getElementById("vmagHist");
         Object.assign(vmagHistDiv.style, {
             width: `${currentWidth - 20}px`,
-            height: `${currentHeight / 7 * 4}px`,
+            height: `${currentHeight / 3 * 2}px`,
             backgroundColor: "black",
             padding: "10px",
             borderRadius: "5px"
