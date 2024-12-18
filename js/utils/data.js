@@ -29,16 +29,15 @@ const stateCode = {
 }
 
 export function dataUpdate(data, currentDate) {
-    const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
+    setInterval(() => {
+        const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
     const filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
-
-    ctx.NUM_SC = Object.fromEntries(
-        d3.group(filteredData, d => d.SatState)
-            .entries() // 将 group 转为可迭代的 [key, values] 数组
-            .map(([key, values]) => [key, values.length]) // 构造 [key, value] 的键值对
-    );
-
-    return;
+        ctx.NUM_SC = Object.fromEntries(
+            d3.group(filteredData, d => d.SatState)
+                .entries() // 将 group 转为可迭代的 [key, values] 数组
+                .map(([key, values]) => [key, values.length]) // 构造 [key, value] 的键值对
+        );
+    }, 1000);
 }
 
 function parseStringDate(rawDatetime) {

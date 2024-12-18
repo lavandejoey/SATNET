@@ -16,9 +16,12 @@ import {loadLaunchLog, loadSites, loadCountry, dataUpdate} from "/js/utils/data"
 import {loadPage} from "/js/utils/loadPage";
 import {ctx} from "/js/utils/config";
 
+
 async function loadViz() {
+    console.log("in");
     // Loading page
     loadPage().then(() => console.log("Page loaded"));
+    
 
     /********************************************* Viewer Initialization *********************************************/
     // Load the 3D and 2D viewers
