@@ -34,7 +34,7 @@ export function getObjectStore(mode = "readonly") {
 }
 
 export async function isCacheValid(cacheKey) {
-    // return false; // debug line
+    return false; // debug line
     if (cacheKey === undefined) return false;
     try {
         const store = await getObjectStore("readonly");

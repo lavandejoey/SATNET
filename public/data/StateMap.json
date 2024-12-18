@@ -1,0 +1,474 @@
+{
+  "SU": {
+    "fullName": "Soviet Union",
+    "iso2Code": "SU"
+  },
+  "US": {
+    "fullName": "United States",
+    "iso2Code": "US"
+  },
+  "UK": {
+    "fullName": "United Kingdom",
+    "iso2Code": "GB"
+  },
+  "CA": {
+    "fullName": "Canada",
+    "iso2Code": "CA"
+  },
+  "I": {
+    "fullName": "International",
+    "iso2Code": "UN"
+  },
+  "I-INT": {
+    "fullName": "International Organization",
+    "iso2Code": "UN"
+  },
+  "F": {
+    "fullName": "France",
+    "iso2Code": "FR"
+  },
+  "J": {
+    "fullName": "Japan",
+    "iso2Code": "JP"
+  },
+  "I-ESRO": {
+    "fullName": "European Space Research Organisation",
+    "iso2Code": "EU"
+  },
+  "AU": {
+    "fullName": "Australia",
+    "iso2Code": "AU"
+  },
+  "I-ELDO": {
+    "fullName": "European Launcher Development Organisation",
+    "iso2Code": "EU"
+  },
+  "D": {
+    "fullName": "Germany",
+    "iso2Code": "DE"
+  },
+  "I-NATO": {
+    "fullName": "North Atlantic Treaty Organization",
+    "iso2Code": "XX"
+  },
+  "CN": {
+    "fullName": "China",
+    "iso2Code": "CN"
+  },
+  "NL": {
+    "fullName": "Netherlands",
+    "iso2Code": "NL"
+  },
+  "E": {
+    "fullName": "Spain",
+    "iso2Code": "ES"
+  },
+  "IN": {
+    "fullName": "India",
+    "iso2Code": "IN"
+  },
+  "I-ESA": {
+    "fullName": "European Space Agency",
+    "iso2Code": "EU"
+  },
+  "ID": {
+    "fullName": "Indonesia",
+    "iso2Code": "ID"
+  },
+  "CSSR": {
+    "fullName": "Czechoslovakia",
+    "iso2Code": "XX"
+  },
+  "I-EUT": {
+    "fullName": "European Union Treaty",
+    "iso2Code": "EU"
+  },
+  "I-ARAB": {
+    "fullName": "Arab League",
+    "iso2Code": "ARAB"
+  },
+  "BR": {
+    "fullName": "Brazil",
+    "iso2Code": "BR"
+  },
+  "RU": {
+    "fullName": "Russia",
+    "iso2Code": "RU"
+  },
+  "MX": {
+    "fullName": "Mexico",
+    "iso2Code": "MX"
+  },
+  "S": {
+    "fullName": "Sweden",
+    "iso2Code": "SE"
+  },
+  "I-EUM": {
+    "fullName": "European Union Movement",
+    "iso2Code": "EU"
+  },
+  "IL": {
+    "fullName": "Israel",
+    "iso2Code": "IL"
+  },
+  "L": {
+    "fullName": "Unknown",
+    "iso2Code": null
+  },
+  "AR": {
+    "fullName": "Argentina",
+    "iso2Code": "AR"
+  },
+  "HKUK": {
+    "fullName": "Hong Kong",
+    "iso2Code": "HK"
+  },
+  "PK": {
+    "fullName": "Pakistan",
+    "iso2Code": "PK"
+  },
+  "I-INM": {
+    "fullName": "International Nuclear Management",
+    "iso2Code": null
+  },
+  "CSFR": {
+    "fullName": "Czechoslovakia",
+    "iso2Code": null
+  },
+  "KR": {
+    "fullName": "South Korea",
+    "iso2Code": "KR"
+  },
+  "P": {
+    "fullName": "Portugal",
+    "iso2Code": "PT"
+  },
+  "T": {
+    "fullName": "Turkey",
+    "iso2Code": "TR"
+  },
+  "TR": {
+    "fullName": "Turkey",
+    "iso2Code": "TR"
+  },
+  "HK": {
+    "fullName": "Hong Kong",
+    "iso2Code": "HK"
+  },
+  "CZ": {
+    "fullName": "Czech Republic",
+    "iso2Code": "CZ"
+  },
+  "UA": {
+    "fullName": "Ukraine",
+    "iso2Code": "UA"
+  },
+  "CL": {
+    "fullName": "Chile",
+    "iso2Code": "CL"
+  },
+  "MY": {
+    "fullName": "Malaysia",
+    "iso2Code": "MY"
+  },
+  "N": {
+    "fullName": "Norway",
+    "iso2Code": "NO"
+  },
+  "PH": {
+    "fullName": "Philippines",
+    "iso2Code": "PH"
+  },
+  "EG": {
+    "fullName": "Egypt",
+    "iso2Code": "EG"
+  },
+  "SG": {
+    "fullName": "Singapore",
+    "iso2Code": "SG"
+  },
+  "KP": {
+    "fullName": "North Korea",
+    "iso2Code": "KP"
+  },
+  "TW": {
+    "fullName": "Taiwan",
+    "iso2Code": "TW"
+  },
+  "DK": {
+    "fullName": "Denmark",
+    "iso2Code": "DK"
+  },
+  "ZA": {
+    "fullName": "South Africa",
+    "iso2Code": "ZA"
+  },
+  "SA": {
+    "fullName": "Saudi Arabia",
+    "iso2Code": "SA"
+  },
+  "UAE": {
+    "fullName": "United Arab Emirates",
+    "iso2Code": "AE"
+  },
+  "MA": {
+    "fullName": "Morocco",
+    "iso2Code": "MA"
+  },
+  "DZ": {
+    "fullName": "Algeria",
+    "iso2Code": "DZ"
+  },
+  "GR": {
+    "fullName": "Greece",
+    "iso2Code": "GR"
+  },
+  "NG": {
+    "fullName": "Nigeria",
+    "iso2Code": "NG"
+  },
+  "IR": {
+    "fullName": "Iran",
+    "iso2Code": "IR"
+  },
+  "KZ": {
+    "fullName": "Kazakhstan",
+    "iso2Code": "KZ"
+  },
+  "BY": {
+    "fullName": "Belarus",
+    "iso2Code": "BY"
+  },
+  "CO": {
+    "fullName": "Colombia",
+    "iso2Code": "CO"
+  },
+  "I-RASC": {
+    "fullName": "Royal Astronomical Society of Canada",
+    "iso2Code": null
+  },
+  "VN": {
+    "fullName": "Vietnam",
+    "iso2Code": "VN"
+  },
+  "BM": {
+    "fullName": "Bermuda",
+    "iso2Code": "BM"
+  },
+  "VE": {
+    "fullName": "Venezuela",
+    "iso2Code": "VE"
+  },
+  "CH": {
+    "fullName": "Switzerland",
+    "iso2Code": "CH"
+  },
+  "MU": {
+    "fullName": "Mauritius",
+    "iso2Code": "MU"
+  },
+  "RO": {
+    "fullName": "Romania",
+    "iso2Code": "RO"
+  },
+  "HU": {
+    "fullName": "Hungary",
+    "iso2Code": "HU"
+  },
+  "PL": {
+    "fullName": "Poland",
+    "iso2Code": "PL"
+  },
+  "AZ": {
+    "fullName": "Azerbaijan",
+    "iso2Code": "AZ"
+  },
+  "AT": {
+    "fullName": "Austria",
+    "iso2Code": "AT"
+  },
+  "EC": {
+    "fullName": "Ecuador",
+    "iso2Code": "EC"
+  },
+  "EE": {
+    "fullName": "Estonia",
+    "iso2Code": "EE"
+  },
+  "QA": {
+    "fullName": "Qatar",
+    "iso2Code": "QA"
+  },
+  "PE": {
+    "fullName": "Peru",
+    "iso2Code": "PE"
+  },
+  "BO": {
+    "fullName": "Bolivia",
+    "iso2Code": "BO"
+  },
+  "LT": {
+    "fullName": "Lithuania",
+    "iso2Code": "LT"
+  },
+  "B": {
+    "fullName": "Belgium",
+    "iso2Code": "BE"
+  },
+  "UY": {
+    "fullName": "Uruguay",
+    "iso2Code": "UY"
+  },
+  "I-EU": {
+    "fullName": "European Union",
+    "iso2Code": "EU"
+  },
+  "PG": {
+    "fullName": "Papua New Guinea",
+    "iso2Code": "PG"
+  },
+  "MC": {
+    "fullName": "Monaco",
+    "iso2Code": "MC"
+  },
+  "LA": {
+    "fullName": "Laos",
+    "iso2Code": "LA"
+  },
+  "PR": {
+    "fullName": "Puerto Rico",
+    "iso2Code": "PR"
+  },
+  "FI": {
+    "fullName": "Finland",
+    "iso2Code": "FI"
+  },
+  "NZ": {
+    "fullName": "New Zealand",
+    "iso2Code": "NZ"
+  },
+  "GH": {
+    "fullName": "Ghana",
+    "iso2Code": "GH"
+  },
+  "MN": {
+    "fullName": "Mongolia",
+    "iso2Code": "MN"
+  },
+  "BD": {
+    "fullName": "Bangladesh",
+    "iso2Code": "BD"
+  },
+  "IE": {
+    "fullName": "Ireland",
+    "iso2Code": "IE"
+  },
+  "SK": {
+    "fullName": "Slovakia",
+    "iso2Code": "SK"
+  },
+  "LV": {
+    "fullName": "Latvia",
+    "iso2Code": "LV"
+  },
+  "BG": {
+    "fullName": "Bulgaria",
+    "iso2Code": "BG"
+  },
+  "AO": {
+    "fullName": "Angola",
+    "iso2Code": "AO"
+  },
+  "KE": {
+    "fullName": "Kenya",
+    "iso2Code": "KE"
+  },
+  "CR": {
+    "fullName": "Costa Rica",
+    "iso2Code": "CR"
+  },
+  "BGN": {
+    "fullName": "Bulgaria",
+    "iso2Code": "BG"
+  },
+  "BT": {
+    "fullName": "Bhutan",
+    "iso2Code": "BT"
+  },
+  "JO": {
+    "fullName": "Jordan",
+    "iso2Code": "JO"
+  },
+  "LK": {
+    "fullName": "Sri Lanka",
+    "iso2Code": "LK"
+  },
+  "NP": {
+    "fullName": "Nepal",
+    "iso2Code": "NP"
+  },
+  "RW": {
+    "fullName": "Rwanda",
+    "iso2Code": "RW"
+  },
+  "SD": {
+    "fullName": "Sudan",
+    "iso2Code": "SD"
+  },
+  "ET": {
+    "fullName": "Ethiopia",
+    "iso2Code": "ET"
+  },
+  "GT": {
+    "fullName": "Guatemala",
+    "iso2Code": "GT"
+  },
+  "SI": {
+    "fullName": "Slovenia",
+    "iso2Code": "SI"
+  },
+  "PY": {
+    "fullName": "Paraguay",
+    "iso2Code": "PY"
+  },
+  "MYM": {
+    "fullName": "Malaysia-Malaysia",
+    "iso2Code": "MY"
+  },
+  "TN": {
+    "fullName": "Tunisia",
+    "iso2Code": "TN"
+  },
+  "KW": {
+    "fullName": "Kuwait",
+    "iso2Code": "KW"
+  },
+  "AM": {
+    "fullName": "Armenia",
+    "iso2Code": "AM"
+  },
+  "MD": {
+    "fullName": "Moldova",
+    "iso2Code": "MD"
+  },
+  "UG": {
+    "fullName": "Uganda",
+    "iso2Code": "UG"
+  },
+  "ZW": {
+    "fullName": "Zimbabwe",
+    "iso2Code": "ZW"
+  },
+  "OM": {
+    "fullName": "Oman",
+    "iso2Code": "OM"
+  },
+  "DJ": {
+    "fullName": "Djibouti",
+    "iso2Code": "DJ"
+  },
+  "SN": {
+    "fullName": "Senegal",
+    "iso2Code": "SN"
+  }
+}
