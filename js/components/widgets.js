@@ -83,7 +83,7 @@ export function addSatelliteGroupOptions() {
     Object.values(ctx.SAT_GROUP).forEach(group => {
         const option = document.createElement("div");
         option.classList.add("option-item", "selected", "w-100", "p-1");
-        option.textContent = group.NAME;
+        option.textContent = group.NAME.split(" ")[0]; // Shorten the name
         // option.textContent = group.NAME + " (" + group.DATA.length + " instances)";
         option.style.cursor = "pointer";
         option.style.textAlign = "center";

@@ -253,6 +253,15 @@ function satellitesAlignments(satGroup, rawName) {
                 }
             });
             break;
+        case ctx.SAT_GROUP.GLONASS:
+            name = rawName.split("(")[0].trim().replaceAll("COSMOS", "Kosmos").replaceAll(" ", "-");
+            ctx.LAUNCHLOG.DATA.find(row => {
+                if (row.Name.toLowerCase() === name.toLowerCase()) {
+                    launchDate = row.Launch_Date;
+                    launchState = row.LVState;
+                }
+            });
+            break;
         case ctx.SAT_GROUP.BEIDOU:
             // "BEIDOU-2 M4 (C12)       "->"BEIDOU-2 M4"
             name = rawName.split("(")[0].trim()
