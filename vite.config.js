@@ -1,9 +1,9 @@
-import {defineConfig} from 'vite';
-import cesium from 'vite-plugin-cesium';
+import {defineConfig} from "vite";
+import cesium from "vite-plugin-cesium";
 
 export default defineConfig({
     build: {
-        target: 'esnext',
+        target: "esnext",
         minify: false,
         sourcemap: true,
         commonjsOptions: {
@@ -11,7 +11,7 @@ export default defineConfig({
         },
     },
     define: {
-        CESIUM_BASE_URL: JSON.stringify('/cesium/'),
+        CESIUM_BASE_URL: JSON.stringify("/cesium/"),
     },
     plugins: [cesium()],
     optimizeDeps: {

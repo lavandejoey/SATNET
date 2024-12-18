@@ -62,7 +62,7 @@ export function display2DCountry() {
         }, 1000);
 
     } catch (error) {
-        console.error('Error initializing satellites:', error);
+        console.error("Error initializing satellites:", error);
     }
 }
 

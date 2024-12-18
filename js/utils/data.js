@@ -164,7 +164,7 @@ export async function loadLaunchLog() {
         cleanedData.forEach(launch => {
             const launchSite = launch.Launch_Site;
             const map_loc = siteData[launchSite];
-            if (map_loc) launch['loc'] = map_loc;
+            if (map_loc) launch["loc"] = map_loc;
             else console.log(launchSite);
         });
 
