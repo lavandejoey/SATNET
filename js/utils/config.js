@@ -1,5 +1,6 @@
 // js/utils/config.js
 import * as Cesium from "cesium";
+import * as d3 from "d3";
 
 // Global context object to manage shared state
 export const ctx = {
@@ -16,6 +17,11 @@ export const ctx = {
 
     currentSatelliteEntity: null, // Current satellite entity
     currentOrbitEntity: null, // Current orbit entity
+    currentSiteEntity: null, // Current site entity
+
+    // load json /data/StateMap.json in dictionary
+    // key: {fullName iso2Code}
+    COUNTRY_MAP: await d3.json("/data/StateMap.json"),
 
     LAUNCHLOG: {
         NAME: "LaunchLog",
@@ -23,8 +29,8 @@ export const ctx = {
         URL: "/data/launchlog.tsv", // Configurable via environment if needed
         DATA: null, // To be populated with launch log data
     },
-    COUNTRY:{
-        NAME:"Country",
+    COUNTRY: {
+        NAME: "Country",
         CACHE_KEY: "country_cache",
         URL: "/data/country.tsv",
         DATA: null,
@@ -50,6 +56,28 @@ export const ctx = {
             SELECTED: true,
         },
         /******************************************* Navigation Satellites *******************************************/
+        GPS: {
+            NAME: "GPS Operational",
+            CATEGORY: "Navigation",
+            COLOR: Cesium.Color.LIGHTGREEN,
+            CACHE_KEY: "gps_tle_cache",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=gps-ops&FORMAT=tle",
+            URL: "/data/tle/GPSTLE.txt",
+            DATA: null,
+            ENTITY: [],
+            SELECTED: true,
+        },
+        GLONASS: {
+            NAME: "GLONASS Operational",
+            CATEGORY: "Navigation",
+            COLOR: Cesium.Color.LIGHTYELLOW,
+            CACHE_KEY: "glonass_tle_cache",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=glo-ops&FORMAT=tle",
+            URL: "/data/tle/GLONASSTLE.txt",
+            DATA: null,
+            ENTITY: [],
+            SELECTED: true,
+        },
         BEIDOU: {
             NAME: "Beidou",
             CATEGORY: "Navigation",
@@ -61,18 +89,6 @@ export const ctx = {
             ENTITY: [],
             SELECTED: true,
         },
-        NOAA: {
-            NAME: "NOAA",
-            CATEGORY: "Weather",
-            COLOR: Cesium.Color.CYAN,
-            CACHE_KEY: "NOAA_tle_cache",
-            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=noaa&FORMAT=tle",
-            URL: "/data/tle/NOAATLE.txt",
-            DATA: null,
-            ENTITY: [],
-            SELECTED: true,
-        },
-        /********************************************* Weather Satellites *********************************************/
         GALILEO: {
             NAME: "Galileo",
             CATEGORY: "Navigation",
@@ -84,12 +100,36 @@ export const ctx = {
             ENTITY: [],
             SELECTED: true,
         },
+        /********************************************* Weather Satellites *********************************************/
+        NOAA: {
+            NAME: "NOAA",
+            CATEGORY: "Weather",
+            COLOR: Cesium.Color.CYAN,
+            CACHE_KEY: "NOAA_tle_cache",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=noaa&FORMAT=tle",
+            URL: "/data/tle/NOAATLE.txt",
+            DATA: null,
+            ENTITY: [],
+            SELECTED: true,
+        },
+        GOES: {
+            NAME: "GOES",
+            CATEGORY: "Weather",
+            COLOR: Cesium.Color.DEEPSKYBLUE,
+            CACHE_KEY: "GOES_tle_cache",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=goes&FORMAT=tle",
+            URL: "/data/tle/GOESTLE.txt",
+            DATA: null,
+            ENTITY: [],
+            SELECTED: true,
+        },
         /******************************************** Scientific Satellites ********************************************/
         GEODETIC: {
             NAME: "Geodetic",
             CATEGORY: "Scientific",
             COLOR: Cesium.Color.PURPLE,
-            // CACHE_KEY: "geodetic_tle_cache",
+            CACHE_KEY: "geodetic_tle_cache",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=geodetic&FORMAT=tle",
             URL: "/data/tle/GeodeticTLE.txt",
             DATA: null,
             ENTITY: [],
@@ -110,15 +150,18 @@ export const CESIUM_SHARE_CLOCK = new Cesium.Clock({
     stopTime: Cesium.JulianDate.fromIso8601(new Date(new Date().getFullYear() + 5, 0, 1).toISOString()),
     clockRange: Cesium.ClockRange.LOOP_STOP, // Loop at the end
     clockStep: Cesium.ClockStep.SYSTEM_CLOCK_MULTIPLIER,
-    multiplier: 10, // Time multiplier for clock
+    multiplier: 300, // Time multiplier for clock
     shouldAnimate: true // Animation enabled by default
 });
 
+export const ionImageryProvider = await Cesium.IonImageryProvider.fromAssetId(3954);
+// export const ionImageryProvider = undefined;
+
 // Common Cesium configuration
 const CESIUM_SHARE_CONFIG = {
-    imageryProvider: undefined, // Can be set to a default imagery provider
+    // imageryProvider: ionImageryProvider,
     baseLayerPicker: false,
-    terrain: undefined, // Can be set to a default terrain provider
+    terrain: undefined,
     infoBox: false,
     navigationHelpButton: false,
     helpButton: false,

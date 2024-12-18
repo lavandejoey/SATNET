@@ -5,26 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Satellite</title>
     <link rel="icon" href="/img/rocket.svg" type="image/x-icon">
-    <link href="/node_modules/cesium/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/index.css">
 </head>
 <body>
 <div id="loadingOverlay">
-    <div class="spinner"></div>
+    <div class="container d-flex flex-column justify-content-center align-items-center">
+        <div class="spinner-grow" role="status"></div>
+        <div class="container text-center my-5">
+            <p class="lead">First time loading may take a while...</p>
+            <p id="loadingInfo" class="lead"></p>
+        </div>
+    </div>
+</div>
+
+<div id="panelContainer" class="container d-flex flex-column m-0 px-4 py-2">
+    <div id="infoContainer" class="container m-0 p-0 py-2">
+        <div class="h3">Satellites Mapper&nbsp;&nbsp;<a class="text-decoration-none"
+                                                        href="https://github.com/lavandejoey/starlink-mapper"
+                                                        target="_blank"><i
+                class="fab fa-github fa-xs text-white"></i></a></div>
+        <div id="brief" class="container-fluid">
+            <div>
+                <a href="https://www.ziyiliu.top/" target="_blank">Ziyi LIU</a>&nbsp;<a
+                    href="mailto:ziyi.liu@ip-paris.fr" target="_blank"><i class="fas fa-envelope"></i></a>
+            </div>
+            <div>
+                <a href="#" target="_blank">Yixing YANG</a>&nbsp;<a href="mailto:yixing.yang@ip-paris.fr"
+                                                                    target="_blank"><i class="fas fa-envelope"></i></a>
+            </div>
+            <div>
+                <a href="#" target="_blank">Ling LIU</a>&nbsp;<a href="mailto:ling.liu@ip-paris.fr" target="_blank"><i
+                    class="fas fa-envelope"></i></a>
+            </div>
+        </div>
+    </div>
+    <div id="controllerContainer" class="container flex-grow-1 m-0 p-0 py-2">
+        <div id="buttonContainer" class="container w-100 m-0 p-0 py-2">
+            <button id="goHome" class="btn btn-sm btn-secondary w-100" aria-label="Go Home"><i class="fas fa-home"></i>
+                Go Home
+            </button>
+        </div>
+        <div class="dropdown m-0 p-0 py-2">
+            <button class="btn btn-sm btn-secondary dropdown-toggle w-100" type="button" id="satelliteDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-satellite"></i> Satellites
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark p-1 w-100" aria-labelledby="satelliteDropdown"
+                data-bs-auto-close="outside" style="min-width: min-content">
+                <!-- Options will be injected here by JavaScript -->
+                <li id="satelliteGroupOptions" style="width: 100%;"></li>
+            </ul>
+        </div>
+    </div>
+    <!--    <div class="container m-0 p-0 py-2">-->
+    <!--        <img src="/img/langfr-480px-Institut_polytechnique_de_Paris_logo.svg.png" class="img-fluid" alt="IP Paris" style="filter: invert(0.8);scale: 0.8;">-->
+    <!--    </div>-->
+    <div style="height: 90px"></div>
+</div>
+
+<div id="satInfo">test info</div>
+<div id="cesium3DViewContainer" class="m-0 p-0"></div>
+<div id="cesium2DViewContainer" class="m-0 p-0"></div>
+
+<div id="cesiumContainerWidgets">
+    <div id="cesiumContainerAnimation"></div>
+    <div id="cesiumContainerTimeline"></div>
 </div>
 
 <div id="stats">
     <!-- <p>TODO: stat info.</p> -->
     <div id="vmagHist"></div>
     <div id="linePlot"></div>
-</div>
-<div id="cesiumContainer3D">
-    <div id="cesiumContainer3DWidgets"></div>
-</div>
-<div id="cesiumContainer2D"></div>
-<div id="cesiumContainerWidgets">
-    <div id="cesiumContainerAnimation"></div>
-    <div id="cesiumContainerTimeline"></div>
 </div>
 <script type="module" src="/js/cesium.js"></script>
 </body>

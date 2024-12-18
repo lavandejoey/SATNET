@@ -1,9 +1,9 @@
-import { defineConfig } from 'vite';
-import cesium from 'vite-plugin-cesium';
+import {defineConfig} from "vite";
+import cesium from "vite-plugin-cesium";
 
 export default defineConfig({
     build: {
-        target: 'esnext',
+        target: "esnext",
         minify: false,
         sourcemap: true,
         commonjsOptions: {
@@ -11,11 +11,24 @@ export default defineConfig({
         },
     },
     define: {
-        CESIUM_BASE_URL: JSON.stringify('/'),
+        CESIUM_BASE_URL: JSON.stringify("/cesium/"),
     },
     plugins: [cesium()],
     optimizeDeps: {
-        include: ['cesium'],
+        include: ["cesium", "d3", "bootstrap"],
     },
-    publicDir: 'public',
+    publicDir: "public",
+    server: {
+        host: "127.0.0.1",
+        port: 4170,
+        strictPort: true,
+        headers: {
+            "Cache-Control": "no-store",
+        },
+    },
+    preview: {
+        host: "127.0.0.1",
+        port: 4170,
+        strictPort: true,
+    },
 });

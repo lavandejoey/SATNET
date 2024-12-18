@@ -1,7 +1,7 @@
 // js/viewer2dManage.js
 import * as Cesium from "cesium";
 import "/node_modules/cesium/Build/Cesium/Widgets/widgets.css";
-import {CESIUM_2D_CONFIG, CESIUM_ACCESS_TOKEN, ctx} from "/js/utils/config";
+import {CESIUM_2D_CONFIG, CESIUM_ACCESS_TOKEN, ctx, ionImageryProvider} from "/js/utils/config";
 import {initCamera, INITIAL_CAMERA_3D} from "/js/utils/camera";
 import {CAMERA_MAX_ALTITUDE, CAMERA_MIN_ALTITUDE, DEGREE_TO_METER, POLE_DISTANCE_METERS} from "/js/utils/constants";
 
@@ -9,9 +9,9 @@ Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 
 export async function MapViewer() {
     // set up the basic Cesium viewer
-    const view2D = new Cesium.Viewer('cesiumContainer2D', CESIUM_2D_CONFIG);
+    const view2D = new Cesium.Viewer("cesium2DViewContainer", CESIUM_2D_CONFIG);
 
-    // await view2D.imageryLayers.addImageryProvider(ionImageryProvider);
+    await view2D.imageryLayers.addImageryProvider(ionImageryProvider);
 
     view2D.scene.globe.enableLighting = true;
 
@@ -62,13 +62,14 @@ async function sync2DView() {
     // Cesium.Cartesian3.distance(ctx.worldPosition, ctx.view3D.scene.camera.positionWC)
     // lower the CAMERA_MIN_ALTITUDE -> CAMERA_MIN_ALTITUDE
     // higher the CAMERA_MAX_ALTITUDE -> CAMERA_MAX_ALTITUDE
-    ctx.cameraAltitude = Math.min(
-        Math.max(
-            Cesium.Cartesian3.distance(ctx.worldPosition, ctx.view3D.scene.camera.positionWC) * 2,
-            CAMERA_MIN_ALTITUDE
-        ),
-        CAMERA_MAX_ALTITUDE
-    );
+    ctx.cameraAltitude = CAMERA_MAX_ALTITUDE;
+    // ctx.cameraAltitude = Math.min(
+        // Math.max(
+        //     Cesium.Cartesian3.distance(ctx.worldPosition, ctx.view3D.scene.camera.positionWC) * 2,
+        //     CAMERA_MIN_ALTITUDE
+        // ),
+        // CAMERA_MAX_ALTITUDE
+    // );
 
     // camera position x, y in 2d meters
     const cameraLatitudeDeg = Cesium.Math.toDegrees(view3DCartographic.latitude);

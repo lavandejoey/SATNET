@@ -1,25 +1,48 @@
 {
+  "type": "module",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "bootstrap": "^5.3.3",
     "cesium": "^1.123.1",
     "d3": "^7.9.0",
+    "flag-icons": "^7.2.3",
     "satellite.js": "^5.0.0",
     "three": "^0.170.0",
-    "tle2czml": "^1.0.0",
     "vite": "^5.4.11",
     "vite-plugin-cesium": "^1.2.23"
   },
   "name": "starlink-mapper",
   "version": "1.0.0",
-  "description": "- 3D satellite plotting (Current)   - Highlight specific satellite (by click): highlight its detailed information.",
-  "main": "index.js",
+  "description": "- 3D satellite plotting (Current) - Highlight specific satellite (by click): highlight its detailed information.",
   "scripts": {
-    "start": "vite --port 4170",
+    "start": "vite",
     "dev": "vite --debug",
     "build": "vite build",
-    "serve": "vite preview --port 4170",
+    "serve": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "contributors": [
+    {
+      "name": "Ziyi LIU",
+      "email": "ziyi.ipparis@outlook.com",
+      "url": "https://www.ziyiliu.top/",
+      "organization": "Institut Polytechnique de Paris"
+    },
+    {
+      "name": "Yixing YANG",
+      "email": "vivianyang036@gmail.com",
+      "organization": "Institut Polytechnique de Paris"
+    },
+    {
+      "name": "Ling LIU",
+      "email": "lingada60@gmail.com",
+      "organization": "Institut Polytechnique de Paris"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lavandejoey/starlink-mapper.git"
+  }
 }
