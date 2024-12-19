@@ -165,7 +165,6 @@ export async function loadLaunchLog() {
             const launchSite = launch.Launch_Site;
             const map_loc = siteData[launchSite];
             if (map_loc) launch["loc"] = map_loc;
-            else console.log(launchSite);
         });
 
         saveToCache(ctx.LAUNCHLOG.CACHE_KEY, cleanedData, ctx.CACHE_DURATION).then(() => console.log("Fetched launch log data from server"));
