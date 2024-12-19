@@ -10,6 +10,7 @@ import {addWidgets} from "/js/components/widgets";
 import {displaySatellites} from "/js/components/GlobeSatellites";
 import {display2DSatellites} from "/js/components/MapSatellites";
 import { display2DCountry } from "/js/components/MapCountry";
+import { display2DSites } from "./components/MapSites";
 import {createStatViz} from "/js/components/StatMap";
 import {loadLaunchLog, loadSites, loadCountry, dataUpdate} from "/js/utils/data";
 import {loadPage} from "/js/utils/loadPage";
@@ -53,8 +54,10 @@ async function loadViz() {
     displaySatellites();
 
     //Display the satellites in 2D
+    display2DSites();
     display2DSatellites();
     display2DCountry();
+    
 }
 
 window.onload = loadViz();
