@@ -62,7 +62,7 @@ function updateBarPlot(data, currentDate) {
         let stateCount;
         if (plotType === "Country") {
             stateCount = Array.from(d3.group(filteredData, d => d.SatState), ([key, values]) => ({
-                key,
+                key: ctx.COUNTRY_MAP[key]?.iso2Code || "xx",
                 value: values.length,
                 satStates: key,
                 code: ctx.COUNTRY_MAP[key]?.iso2Code || "xx",

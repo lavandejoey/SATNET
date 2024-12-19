@@ -39,6 +39,7 @@ export function display2DCountry() {
 
 
 export async function createSatelliteRadiusEntity(currentEntities, loc, size, key) {
+    size = Math.log(size)*10;
     const stateIsoCode = ctx.COUNTRY_MAP[key]?.iso2Code || "xx";
     const imagePath = await getFlagSvg(stateIsoCode);
     const entityId = `country-${key}`; // Generate unique ID for the entity
@@ -53,7 +54,7 @@ export async function createSatelliteRadiusEntity(currentEntities, loc, size, ke
                 image: imagePath,
                 width: size,
                 height: size,
-                color: new Cesium.Color(1.0, 1.0, 1.0, 0.5),
+                color: new Cesium.Color(1.0, 1.0, 1.0, 0.2),
             };
         } else {
             existingEntity.point = {

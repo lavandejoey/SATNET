@@ -26,8 +26,8 @@ function createSatelliteEntity(loc){
         position: Cesium.Cartesian3.fromDegrees(loc.Longitude, loc.Latitude),
         point: {
             pixelSize: startRadius,
-            color: Cesium.Color.GREY.withAlpha(0.5),
-            outlineColor: Cesium.Color.GREY.withAlpha(0.5),
+            color: Cesium.Color.WHITESMOKE.withAlpha(0.5),
+            outlineColor: Cesium.Color.WHITESMOKE.withAlpha(0.5),
             outlineWidth: 0,
         },
     }
