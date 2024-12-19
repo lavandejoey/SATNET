@@ -18,8 +18,8 @@ const COLOURS = {
     BUTTON_ACTIVE: "steelblue",
     BAR_FILL: "steelblue",
     LINE_STROKE: "steelblue",
-    countryColorMap: {"US": "#2E3A87", "CN": "#E5E5E5", "UK": "#9B4F96", "RU": "#F1C6D1"},
-    starrySkyColorsArray: ["#1B4F6C", "#4F9AC8", "#D9A8D3", "#D9F2FF"]
+    countryColorMap: {"US": "#27296d", "CN": "#a393eb", "UK": "#7e6bc4", "RU": "#5e63b6"},
+    starrySkyColorsArray: ['#D198E9', '#F2B3FD', '#8C5AA8', '#5A2D6C', '#E3A6F3', '#BF85D9', '#AE77C9', '#6A3F84', '#7B4C96', '#9D69B9']
 };
 
 /** Using `ctx.COUNTRY_MAP[d.key]` to get the fullName / iso2Code of the country */
@@ -29,7 +29,7 @@ const colorScale = d3.scaleOrdinal(COLOURS.starrySkyColorsArray);
 let svgBar, xBar, yBar, plotType = "Country";
 let svgLine, xLine, yLine;
 const buttonWidth = 120;
-const buttonHeight = 40;
+const buttonHeight = 30;
 const buttonSpacing = 30;
 let nonselectedCountry = [];
 // const majorCountry = ["US", "CN","UK", "RU"];
@@ -309,7 +309,8 @@ function initBarPlot() {
             .attr("text-anchor", "middle")
             .text(d => d.label)
             .style("font-size", "12px")
-            .style("cursor", "pointer");
+            .style("cursor", "pointer")
+            .style("fill", "white");
 
         // Create filter buttons
         const filterBar = svgContainer.append("g")
