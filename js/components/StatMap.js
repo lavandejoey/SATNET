@@ -30,11 +30,11 @@ const COLOURS = {
 };
 
 const filter_buttons = [
-    {id: "US", label: "United States"},
     {id: "CN", label: "China"},
-    {id: "RU", label: "Russia"},
     {id: "F", label: "France"},
+    {id: "RU", label: "Russia"},
     {id: "UK", label: "United Kingdom"},
+    {id: "US", label: "United States"},
 ];
 
 /** Using `ctx.COUNTRY_MAP[d.key]` to get the fullName / iso2Code of the country */

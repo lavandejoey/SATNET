@@ -133,7 +133,7 @@ export const CESIUM_SHARE_CLOCK = new Cesium.Clock({
     stopTime: Cesium.JulianDate.fromIso8601(new Date(new Date().getFullYear() + 5, 0, 1).toISOString()),
     clockRange: Cesium.ClockRange.LOOP_STOP, // Loop at the end
     clockStep: Cesium.ClockStep.SYSTEM_CLOCK_MULTIPLIER,
-    multiplier: 300, // Time multiplier for clock
+    multiplier: 100, // Time multiplier for clock
     shouldAnimate: true // Animation enabled by default
 });
 

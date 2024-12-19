@@ -9,7 +9,7 @@
     "vite": "^5.4.11",
     "vite-plugin-cesium": "^1.2.23"
   },
-  "name": "starlink-mapper",
+  "name": "SATNET: Satellite Analysis and Tracking Network",
   "version": "1.0.0",
   "description": "- 3D satellite plotting (Current) - Highlight specific satellite (by click): highlight its detailed information.",
   "scripts": {
@@ -41,6 +41,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lavandejoey/starlink-mapper.git"
+    "url": "https://github.com/lavandejoey/SATNET.git"
   }
 }
