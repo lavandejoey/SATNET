@@ -9,24 +9,6 @@ import {EARTH_RADIUS_METERS, ORBIT_TYPES} from "/js/utils/constants.js";
 // Keep col: #Launch_Tag, Launch_Date, Piece, Name, PLName, SatOwner, SatState, Launch_Site
 const REQUIRED_COLUMNS = ["#Launch_Tag", "Launch_Date", "Piece", "Name", "PLName", "SatOwner", "SatState", "Launch_Site", "LVState"];
 const SITE_REQUIRED_COLUMNS = ["#Site", "Longitude", "Latitude", "Type", "TStart", "TStop"];
-const stateCode = {
-    "US": "United States",
-    "CN": "China",
-    "IN": "India",
-    "UK": "United Kingdom",
-    "RU": "Russian Federation",
-    "UY": "Uruguay",
-    "CA": "Canada",
-    "I": "Italy",
-    "I-EU": "Italy",
-    "I-ESA": "Italy",
-    "F": 'France',
-    "J": "Japan",
-    "D": "Germany",
-    "KR": "South Korea",
-    "E": "Spain",
-    "L": "Luxembourg"
-}
 
 export function dataUpdate(data, currentDate) {
     const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
@@ -103,8 +85,7 @@ export async function loadSites() {
 
 export async function loadCountry() {
     if (await isCacheValid(ctx.COUNTRY.CACHE_KEY)) {
-        const cachedData = await getCachedData(ctx.COUNTRY.CACHE_KEY);
-        ctx.COUNTRY.DATA = cachedData;
+        ctx.COUNTRY.DATA = await getCachedData(ctx.COUNTRY.CACHE_KEY);
         console.log("Fetched country data from cache");
         return;
     }

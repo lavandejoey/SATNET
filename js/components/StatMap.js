@@ -9,16 +9,22 @@
 // On the bottom right: a line graph（折线图） to show the launched number every year (static)
 import * as d3 from "d3";
 import * as Cesium from "cesium";
-import {ctx} from "/js/utils/config";
-import {getFlagSvg} from "/js/utils/data.js";
+import { ctx } from "/js/utils/config";
+import { getFlagSvg } from "/js/utils/data.js";
 
-const margin = {top: 20, right: 60, bottom: 40, left: 80};
+const margin = { top: 20, right: 60, bottom: 40, left: 80 };
 const COLOURS = {
     BUTTON_BG: "lightgray",
     BUTTON_ACTIVE: "steelblue",
     BAR_FILL: "steelblue",
     LINE_STROKE: "steelblue",
-    countryColorMap: {"US": "#27296d", "CN": "#a393eb", "UK": "#7e6bc4", "RU": "#5e63b6"},
+    countryColorMap: { "US": "#27296d", "CN": "#a393eb", "UK": "#7e6bc4", "RU": "#5e63b6" },
+    countryColorMap_shadow: {
+        "US": "#5A6AA9",
+        "CN": "#F2F2F2",
+        "UK": "#C27DB5",
+        "RU": "#F6DCE3"
+    },
     starrySkyColorsArray: ['#D198E9', '#F2B3FD', '#8C5AA8', '#5A2D6C', '#E3A6F3', '#BF85D9', '#AE77C9', '#6A3F84', '#7B4C96', '#9D69B9']
 };
 
@@ -203,7 +209,7 @@ function updateBarPlot(data, currentDate) {
             // Update existing images
             imgs.transition().duration(500)
                 .attr("x", d => xBar(d.logValue) + 10) // Adjust position slightly to the right of the bar
-                .attr("y", d => yBar(d.key)) // Vertically center the flag image
+                .attr("y", d => yBar(d.key) + 5) // Vertically center the flag image
                 .attr("width", yBar.bandwidth()) // Set the flag width
                 .attr("height", yBar.bandwidth()); // Set the flag height
 
@@ -212,7 +218,7 @@ function updateBarPlot(data, currentDate) {
                 .append("foreignObject")
                 .attr("class", "countryImg")
                 .attr("x", d => xBar(d.logValue) + 10)
-                .attr("y", d => yBar(d.key))
+                .attr("y", d => yBar(d.key) + 5)
                 .attr("width", yBar.bandwidth())
                 .attr("height", yBar.bandwidth())
                 .append("xhtml:div")
@@ -240,7 +246,7 @@ function updateBarPlot(data, currentDate) {
 function initBarPlot() {
     try {
         const vmagHistDiv = document.getElementById('vmagHist');
-        const {clientWidth: currentWidth, clientHeight: currentHeight} = vmagHistDiv;
+        const { clientWidth: currentWidth, clientHeight: currentHeight } = vmagHistDiv;
 
         const width = currentWidth - margin.left - margin.right;
         const height = currentHeight - margin.top * 2 - margin.bottom * 2;
@@ -272,8 +278,8 @@ function initBarPlot() {
             .attr("transform", `translate(${margin.left},${margin.top - 20})`);
 
         const buttons = [
-            {id: "button-country", label: "Country"},
-            {id: "button-agent", label: "Agent"}
+            { id: "button-country", label: "Country" },
+            { id: "button-agent", label: "Agent" }
         ];
 
 
@@ -317,10 +323,10 @@ function initBarPlot() {
             .attr("transform", `translate(${margin.left},${currentHeight - buttonHeight - 20})`);
 
         const filter_buttons = [
-            {id: "US", label: "US"},
-            {id: "CN", label: "CN"},
-            {id: "RU", label: "RU"},
-            {id: "UK", label: "UK"},
+            { id: "US", label: "United States" },
+            { id: "CN", label: "China" },
+            { id: "RU", label: "Russia" },
+            { id: "UK", label: "United Kindom" },
         ];
 
         const filterGroups = filterBar.selectAll(".filter-group")
@@ -328,7 +334,8 @@ function initBarPlot() {
             .enter()
             .append("g")
             .attr("class", "filter-group")
-            .attr("transform", (d, i) => `translate(${i * (buttonWidth + buttonSpacing)}, 0)`);
+            .attr("transform", (d, i) => `translate(${i * (buttonWidth + buttonSpacing)}, ${buttonHeight / 4})`);
+
 
         filterGroups.append("rect")
             .attr("class", "filter-bg")
@@ -336,7 +343,7 @@ function initBarPlot() {
             .attr("height", buttonHeight)
             .attr("rx", 5)
             .attr("ry", 5)
-            .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.countryColorMap[d.id] : COLOURS.BUTTON_BG)
+            // .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.countryColorMap[d.id] : COLOURS.countryColorMap_shadow[d.id])
             // .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG)
             .style("cursor", "pointer")
             .on("click", function (event, d) {
@@ -348,23 +355,34 @@ function initBarPlot() {
                     nonselectedCountry.push(d.id);
                 }
 
-                d3.selectAll(".filter-bg")
+                d3.selectAll(".filter-rect")
                     // .style("fill", btn => nonselectedCountry.includes(btn.id) ? COLOURS.BUTTON_BG : COLOURS.BUTTON_ACTIVE);
-                    .style("fill", btn => !nonselectedCountry.includes(btn.id) ? COLOURS.countryColorMap[btn.id] : COLOURS.BUTTON_BG);
+                    .style("fill", btn => !nonselectedCountry.includes(btn.id) ? COLOURS.countryColorMap[btn.id] : COLOURS.countryColorMap_shadow[btn.id]);
 
                 // filter data
                 updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
-                console.log(nonselectedCountry)
+                // console.log(nonselectedCountry)
             });
+
+        filterGroups.append("rect")
+            .attr("class", "filter-rect")
+            .attr("width", buttonWidth / 6)
+            .attr("height", buttonHeight / 2)
+            .attr("rx", 5)
+            .attr("ry", 5)
+            .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.countryColorMap[d.id] : COLOURS.countryColorMap_shadow[d.id])
+        // .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG)
 
         filterGroups.append("text")
             .attr("x", buttonWidth / 2)
-            .attr("y", buttonHeight / 2)
+            .attr("y", buttonHeight / 4)
             .attr("dy", "0.35em")
             .attr("text-anchor", "middle")
             .text(d => d.label)
-            .style("font-size", "12px")
+            .style("font-size", "18px")
+            .style("fill", "white")
             .style("cursor", "pointer");
+
 
     } catch (error) {
         console.error("Error initializing bar plot:", error);
@@ -374,7 +392,7 @@ function initBarPlot() {
 function initLineChart() {
     try {
         const linePlotDiv = document.getElementById("linePlot");
-        const {clientWidth: currentWidth, clientHeight: currentHeight} = linePlotDiv;
+        const { clientWidth: currentWidth, clientHeight: currentHeight } = linePlotDiv;
 
         const width = currentWidth - margin.left - margin.right;
         const height = currentHeight - margin.top - margin.bottom;
@@ -470,7 +488,7 @@ export function createStatViz() {
 
         const statsDiv = document.getElementById("stats");
         statsDiv.style.backgroundColor = "blue";
-        const {offsetWidth: currentWidth, offsetHeight: currentHeight} = statsDiv;
+        const { offsetWidth: currentWidth, offsetHeight: currentHeight } = statsDiv;
         // console.log(currentHeight, currentWidth);
 
         const vmagHistDiv = document.getElementById("vmagHist");
