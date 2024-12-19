@@ -1,4 +1,4 @@
-# Starlink Mapper
+# SatNet
 
 ---
 
