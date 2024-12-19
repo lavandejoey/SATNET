@@ -9,16 +9,23 @@
 // On the bottom right: a line graph（折线图） to show the launched number every year (static)
 import * as d3 from "d3";
 import * as Cesium from "cesium";
-import { ctx } from "/js/utils/config";
-import { getFlagSvg } from "/js/utils/data.js";
+import {ctx} from "/js/utils/config";
+import {getFlagSvg} from "/js/utils/data.js";
 
-const margin = { top: 20, right: 60, bottom: 40, left: 80 };
+// Define constants for styling
+const BUTTON_PADDING = {left: 10, right: 10, top: 5, bottom: 5};
+const SQUARE_SIZE = 20; // Size of the color square
+const BUTTON_SPACING = 15; // Space between buttons
+const TEXT_OFFSET_X = SQUARE_SIZE + 10; // Space between square and text
+const TEXT_FONT_SIZE = 16; // Font size for labels
+
+const margin = {top: 20, right: 60, bottom: 40, left: 80};
 const COLOURS = {
     BUTTON_BG: "lightgray",
     BUTTON_ACTIVE: "steelblue",
     BAR_FILL: "steelblue",
     LINE_STROKE: "steelblue",
-    countryColorMap: { "US": "#27296d", "CN": "#a393eb", "UK": "#7e6bc4", "RU": "#5e63b6" },
+    countryColorMap: {"US": "#27296d", "CN": "#a393eb", "UK": "#7e6bc4", "RU": "#5e63b6"},
     countryColorMap_shadow: {
         "US": "#5A6AA9",
         "CN": "#F2F2F2",
@@ -38,7 +45,6 @@ const buttonWidth = 120;
 const buttonHeight = 30;
 const buttonSpacing = 30;
 let nonselectedCountry = [];
-// const majorCountry = ["US", "CN","UK", "RU"];
 
 // Utility function to debounce events
 function debounce(func, wait) {
@@ -246,7 +252,7 @@ function updateBarPlot(data, currentDate) {
 function initBarPlot() {
     try {
         const vmagHistDiv = document.getElementById('vmagHist');
-        const { clientWidth: currentWidth, clientHeight: currentHeight } = vmagHistDiv;
+        const {clientWidth: currentWidth, clientHeight: currentHeight} = vmagHistDiv;
 
         const width = currentWidth - margin.left - margin.right;
         const height = currentHeight - margin.top * 2 - margin.bottom * 2;
@@ -278,8 +284,8 @@ function initBarPlot() {
             .attr("transform", `translate(${margin.left},${margin.top - 20})`);
 
         const buttons = [
-            { id: "button-country", label: "Country" },
-            { id: "button-agent", label: "Agent" }
+            {id: "button-country", label: "Country"},
+            {id: "button-agent", label: "Agent"}
         ];
 
 
@@ -302,9 +308,6 @@ function initBarPlot() {
                 plotType = d.label;
                 d3.selectAll(".button-bg").style("fill", COLOURS.BUTTON_BG);
                 d3.select(this).style("fill", COLOURS.BUTTON_ACTIVE);
-                // if (plotType === "Country"){
-
-                // }
                 updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
             });
 
@@ -318,71 +321,108 @@ function initBarPlot() {
             .style("cursor", "pointer")
             .style("fill", "white");
 
-        // Create filter buttons
-        const filterBar = svgContainer.append("g")
-            .attr("transform", `translate(${margin.left},${currentHeight - buttonHeight - 20})`);
+        // // Create filter buttons
+        // const filterBar = svgContainer.append("g")
+        //     .attr("transform", `translate(${margin.left},${currentHeight - buttonHeight - 20})`);
 
         const filter_buttons = [
-            { id: "US", label: "United States" },
-            { id: "CN", label: "China" },
-            { id: "RU", label: "Russia" },
-            { id: "UK", label: "United Kindom" },
+            {id: "US", label: "United States"},
+            {id: "CN", label: "China"},
+            {id: "RU", label: "Russia"},
+            {id: "UK", label: "United Kindom"},
         ];
 
+        function computeButtonPosition(currentData) {
+            const index = filter_buttons.indexOf(currentData);
+            let position = 0;
+            for (let i = 0; i < index; i++) {
+                const btn = filter_buttons[i];
+                const btnGroup = filterGroups.filter(d => d.id === btn.id);
+                const textWidth = btnGroup.select(".button-label").node().getComputedTextLength();
+                position += BUTTON_PADDING.left + SQUARE_SIZE + 10 + textWidth + BUTTON_PADDING.right + BUTTON_SPACING;
+            }
+            return position;
+        }
+
+        // Create a group for the filter bar
+        const filterBar = svgContainer.append("g")
+            .attr("transform", `translate(${margin.left}, ${currentHeight - buttonHeight - 20})`);
+
+        // Create filter groups for each button
         const filterGroups = filterBar.selectAll(".filter-group")
             .data(filter_buttons)
             .enter()
             .append("g")
             .attr("class", "filter-group")
-            .attr("transform", (d, i) => `translate(${i * (buttonWidth + buttonSpacing)}, ${buttonHeight / 4})`);
-
-
-        filterGroups.append("rect")
-            .attr("class", "filter-bg")
-            .attr("width", buttonWidth)
-            .attr("height", buttonHeight)
-            .attr("rx", 5)
-            .attr("ry", 5)
-            // .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.countryColorMap[d.id] : COLOURS.countryColorMap_shadow[d.id])
-            // .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG)
-            .style("cursor", "pointer")
+            .attr("cursor", "pointer") // Change cursor to pointer on hover
             .on("click", function (event, d) {
+                // Toggle selection
                 const index = nonselectedCountry.indexOf(d.id);
-
                 if (index > -1) {
                     nonselectedCountry.splice(index, 1);
                 } else {
                     nonselectedCountry.push(d.id);
                 }
 
-                d3.selectAll(".filter-rect")
-                    // .style("fill", btn => nonselectedCountry.includes(btn.id) ? COLOURS.BUTTON_BG : COLOURS.BUTTON_ACTIVE);
-                    .style("fill", btn => !nonselectedCountry.includes(btn.id) ? COLOURS.countryColorMap[btn.id] : COLOURS.countryColorMap_shadow[btn.id]);
+                // Update button styles based on selection
+                filterGroups.each(function (btn) {
+                    const isSelected = !nonselectedCountry.includes(btn.id);
+                    d3.select(this)
+                        .select(".color-square")
+                        .style("opacity", isSelected ? 1 : 0.5);
 
-                // filter data
+                    d3.select(this)
+                        .select(".button-label")
+                        .style("opacity", isSelected ? 1 : 0.5);
+                });
+
+                // Filter data (replace with your actual update function)
                 updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
-                // console.log(nonselectedCountry)
             });
 
+        // Append color squares to each filter group
         filterGroups.append("rect")
-            .attr("class", "filter-rect")
-            .attr("width", buttonWidth / 6)
-            .attr("height", buttonHeight / 2)
-            .attr("rx", 5)
-            .attr("ry", 5)
-            .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.countryColorMap[d.id] : COLOURS.countryColorMap_shadow[d.id])
-        // .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG)
+            .attr("class", "color-square")
+            .attr("width", SQUARE_SIZE)
+            .attr("height", SQUARE_SIZE)
+            .attr("rx", 3)
+            .attr("ry", 3)
+            .style("fill", d => COLOURS.countryColorMap[d.id])
+            .style("opacity", d => !nonselectedCountry.includes(d.id) ? 1 : 0.5);
 
+        // Append labels to each filter group
         filterGroups.append("text")
-            .attr("x", buttonWidth / 2)
-            .attr("y", buttonHeight / 4)
-            .attr("dy", "0.35em")
-            .attr("text-anchor", "middle")
+            .attr("class", "button-label")
+            .attr("x", TEXT_OFFSET_X)
+            .attr("y", SQUARE_SIZE / 2)
+            .attr("dy", "0.35em") // Vertically center the text
             .text(d => d.label)
-            .style("font-size", "18px")
+            .style("font-size", `${TEXT_FONT_SIZE}px`)
             .style("fill", "white")
-            .style("cursor", "pointer");
+            .style("opacity", d => !nonselectedCountry.includes(d.id) ? 1 : 0.5);
 
+        // Dynamically calculate the width of each button based on the text length
+        filterGroups.each(function (d) {
+            const textElement = d3.select(this).select(".button-label");
+            const textWidth = textElement.node().getComputedTextLength();
+            const buttonWidth = BUTTON_PADDING.left + SQUARE_SIZE + 10 + textWidth + BUTTON_PADDING.right;
+            const buttonHeight = SQUARE_SIZE + BUTTON_PADDING.top + BUTTON_PADDING.bottom;
+
+            // Set the size of the group
+            d3.select(this)
+                .attr("transform", `translate(${computeButtonPosition(d)}, 0)`);
+
+            // Set the size of the color square
+            d3.select(this).append("rect")
+                .attr("class", "button-bg")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", buttonWidth)
+                .attr("height", buttonHeight)
+                // opacity 0.4 white background
+                // .style("fill", "rgba(255, 255, 255, 0.4)");
+                .style("fill", "transparent");
+        });
 
     } catch (error) {
         console.error("Error initializing bar plot:", error);
@@ -392,7 +432,7 @@ function initBarPlot() {
 function initLineChart() {
     try {
         const linePlotDiv = document.getElementById("linePlot");
-        const { clientWidth: currentWidth, clientHeight: currentHeight } = linePlotDiv;
+        const {clientWidth: currentWidth, clientHeight: currentHeight} = linePlotDiv;
 
         const width = currentWidth - margin.left - margin.right;
         const height = currentHeight - margin.top - margin.bottom;
@@ -432,7 +472,7 @@ function initLineChart() {
 
             cumulativeYearCount.push({
                 year: d.year,
-                cumulativeValue: logCumulativeValue
+                cumulativeValue: cumulativeValue
             });
         });
 
@@ -488,7 +528,7 @@ export function createStatViz() {
 
         const statsDiv = document.getElementById("stats");
         statsDiv.style.backgroundColor = "blue";
-        const { offsetWidth: currentWidth, offsetHeight: currentHeight } = statsDiv;
+        const {offsetWidth: currentWidth, offsetHeight: currentHeight} = statsDiv;
         // console.log(currentHeight, currentWidth);
 
         const vmagHistDiv = document.getElementById("vmagHist");
