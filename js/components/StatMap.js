@@ -25,15 +25,17 @@ const COLOURS = {
     BUTTON_ACTIVE: "steelblue",
     BAR_FILL: "steelblue",
     LINE_STROKE: "steelblue",
-    countryColorMap: {"US": "#27296d", "CN": "#a393eb", "UK": "#7e6bc4", "RU": "#5e63b6"},
-    countryColorMap_shadow: {
-        "US": "#5A6AA9",
-        "CN": "#F2F2F2",
-        "UK": "#C27DB5",
-        "RU": "#F6DCE3"
-    },
+    countryColorMap: {"US": "#27296d", "CN": "#a393eb", "UK": "#7e6bc4", "RU": "#5e63b6", "F": "#5E63B6FF"},
     starrySkyColorsArray: ['#D198E9', '#F2B3FD', '#8C5AA8', '#5A2D6C', '#E3A6F3', '#BF85D9', '#AE77C9', '#6A3F84', '#7B4C96', '#9D69B9']
 };
+
+const filter_buttons = [
+    {id: "US", label: "United States"},
+    {id: "CN", label: "China"},
+    {id: "RU", label: "Russia"},
+    {id: "F", label: "France"},
+    {id: "UK", label: "United Kingdom"},
+];
 
 /** Using `ctx.COUNTRY_MAP[d.key]` to get the fullName / iso2Code of the country */
 
@@ -73,7 +75,7 @@ function updateBarPlot(data, currentDate) {
             }
         });
 
-        let currentYear = currentDate.getFullYear()
+        let currentYear = currentDate.getFullYear();
         let totalCount = filteredData.length;
 
         let stateCount;
@@ -83,15 +85,15 @@ function updateBarPlot(data, currentDate) {
                 value: values.length,
                 satStates: Array.from(new Set(values.map(v => v.SatState))),
                 code: key,
-                fullNmae: values[0].stateFullname
+                fullName: values[0].stateFullname
             }));
         } else if (plotType === "Agent") {
             stateCount = Array.from(d3.group(filteredData, d => d.SatOwner), ([key, values]) => ({
                 key,
                 value: values.length,
                 satStates: Array.from(new Set(values.map(v => v.SatState))),
-                code: key,
-                fullNmae: values[0].stateFullname
+                code: values[0].stateCode,
+                fullName: values[0].stateFullname
             }));
         }
 
@@ -149,11 +151,11 @@ function updateBarPlot(data, currentDate) {
             .attr("height", yBar.bandwidth())
             .attr("x", 0)
             .attr("width", 0)
-            .style("fill", d => COLOURS.countryColorMap[d.satStates] || colorScale(d.satStates))
+            .style("fill", d => COLOURS.countryColorMap[d.code] || colorScale(d.code))
             .on("mouseover", function (event, d) {
                 d3.select(this)
                     .append("title")
-                    .text(() => d.fullNmae);
+                    .text(() => d.fullName);
             })
             .transition().duration(500)
             .attr("width", d => xBar(d.logValue));
@@ -332,15 +334,8 @@ function initBarPlot() {
         // const filterBar = svgContainer.append("g")
         //     .attr("transform", `translate(${margin.left},${currentHeight - buttonHeight - 20})`);
 
-        const filter_buttons = [
-            {id: "US", label: "United States"},
-            {id: "CN", label: "China"},
-            {id: "RU", label: "Russia"},
-            {id: "UK", label: "United Kindom"},
-        ];
-
         function computeButtonPosition(currentData) {
-            const index = filter_buttons.indexOf(currentData);
+            const index = filter_buttons.findIndex(btn => btn.id === currentData.id);
             let position = 0;
             for (let i = 0; i < index; i++) {
                 const btn = filter_buttons[i];
