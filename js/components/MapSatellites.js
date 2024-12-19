@@ -4,7 +4,6 @@ import {ctx} from "/js/utils/config";
 
 export function display2DSatellites() {
     try {
-        ctx.view2D.entities.removeAll();
         const launchDatas = ctx.LAUNCHLOG.DATA;
         const lifespan = 2000;
         ctx.view3D.clock.onTick.addEventListener(() => {
@@ -17,12 +16,13 @@ export function display2DSatellites() {
                 if (currentTime.toDateString() === launchDate.toDateString()) {
                     const launchRadiusEntity = createSatelliteRadiusEntity(loc, launchDate, lifespan);
                     const launchEntity = createSatelliteEntity(loc);
+                    let entity_id, entity2_id;
                     // 5seconds remove the point
                     if (launchRadiusEntity) {
-                        var entity_id = ctx.view2D.entities.add(launchRadiusEntity);
+                        entity_id = ctx.view2D.entities.add(launchRadiusEntity);
                     }
                     if (launchEntity){
-                        var entity2_id = ctx.view2D.entities.add(launchEntity);
+                        entity2_id = ctx.view2D.entities.add(launchEntity);
                     }
                     setTimeout(() => {
                         if (entity2_id){
