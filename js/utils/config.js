@@ -45,16 +45,16 @@ export const ctx = {
 
     SAT_GROUP: {
         /****************************************** Communication Satellites ******************************************/
-        STARLINK: {
-            NAME: "Starlink",
-            CATEGORY: "Communications",
-            COLOR: Cesium.Color.ORANGERED,
-            CACHE_KEY: "starlink_tle_cache",
-            URL: "/data/tle/StarlinkTLE.txt", // Configurable via environment if needed
-            DATA: null, // To be populated with Starlink TLE data
-            ENTITY: [],
-            SELECTED: true,
-        },
+        // STARLINK: {
+        //     NAME: "Starlink",
+        //     CATEGORY: "Communications",
+        //     COLOR: Cesium.Color.ORANGERED,
+        //     CACHE_KEY: "starlink_tle_cache",
+        //     URL: "/data/tle/StarlinkTLE.txt", // Configurable via environment if needed
+        //     DATA: null, // To be populated with Starlink TLE data
+        //     ENTITY: [],
+        //     SELECTED: true,
+        // },
         /******************************************* Navigation Satellites *******************************************/
         GPS: {
             NAME: "GPS Operational",
