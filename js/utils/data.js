@@ -8,7 +8,7 @@ import {EARTH_RADIUS_METERS, ORBIT_TYPES} from "/js/utils/constants.js";
 
 // Keep col: #Launch_Tag, Launch_Date, Piece, Name, PLName, SatOwner, SatState, Launch_Site
 const REQUIRED_COLUMNS = ["#Launch_Tag", "Launch_Date", "Piece", "Name", "PLName", "SatOwner", "SatState", "Launch_Site", "LVState"];
-const SITE_REQUIRED_COLUMNS = ["#Site", "Longitude", "Latitude"];
+const SITE_REQUIRED_COLUMNS = ["#Site", "Longitude", "Latitude", "Type", "TStart", "TStop"];
 const stateCode = {
     "US": "United States",
     "CN": "China",
@@ -29,15 +29,14 @@ const stateCode = {
 }
 
 export function dataUpdate(data, currentDate) {
-    setInterval(() => {
-        const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
+    const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
     const filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
-        ctx.NUM_SC = Object.fromEntries(
-            d3.group(filteredData, d => d.SatState)
-                .entries() // 将 group 转为可迭代的 [key, values] 数组
-                .map(([key, values]) => [key, values.length]) // 构造 [key, value] 的键值对
-        );
-    }, 1000);
+    ctx.NUM_SC = Object.fromEntries(
+        d3.group(filteredData, d => d.SatState)
+            .entries() 
+            .map(([key, values]) => [key, values.length]) 
+    );
+    return null;
 }
 
 function parseStringDate(rawDatetime) {
@@ -79,8 +78,11 @@ export async function loadSites() {
         const parsedData = data.map(row => ({
             ...row
         }));
-        const cleanedData = cleanDataColumns(parsedData, SITE_REQUIRED_COLUMNS);
-
+        let cleanedData = cleanDataColumns(parsedData, SITE_REQUIRED_COLUMNS);
+        cleanedData = cleanedData.filter(
+            d => d.Type == "LS" && d.TStart!='-' && d.TStart &&
+            d.TStart <= 2011 && d.TStop!='-');
+        console.log(cleanedData);
         ctx.SITES.DATA = cleanedData.reduce((acc, site) => {
             const siteKey = site["#Site"].trim();
             const longitude = parseFloat(site["Longitude"]);
@@ -119,7 +121,6 @@ export async function loadCountry() {
             const latitude = parseFloat(site["Latitude"]);
 
             acc[country] = {Longitude: longitude, Latitude: latitude};
-            // ctx.NUM_SC[country] = 0;
             return acc;
         }, {});
         console.log("Fetched country data from server");
