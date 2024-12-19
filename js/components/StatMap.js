@@ -29,7 +29,7 @@ const colorScale = d3.scaleOrdinal(COLOURS.starrySkyColorsArray);
 let svgBar, xBar, yBar, plotType = "Country";
 let svgLine, xLine, yLine;
 const buttonWidth = 120;
-const buttonHeight = 40;
+const buttonHeight = 30;
 const buttonSpacing = 30;
 let nonselectedCountry = [];
 // const majorCountry = ["US", "CN","UK", "RU"];
@@ -309,7 +309,8 @@ function initBarPlot() {
             .attr("text-anchor", "middle")
             .text(d => d.label)
             .style("font-size", "12px")
-            .style("cursor", "pointer");
+            .style("cursor", "pointer")
+            .style("fill", "white");
 
         // Create filter buttons
         const filterBar = svgContainer.append("g")
