@@ -7,59 +7,21 @@
 // On the top: several barchart graphs which can be swithed between launched_site, owner and so on. (dynamic)
 // On the bottom left: pie chart
 // On the bottom right: a line graph（折线图） to show the launched number every year (static)
-import * as Cesium from "cesium";
-import { ctx } from "/js/utils/config";
 import * as d3 from "d3";
+import * as Cesium from "cesium";
+import {ctx} from "/js/utils/config";
 
-const margin = { top: 20, right: 60, bottom: 40, left: 80 };
+const margin = {top: 20, right: 60, bottom: 40, left: 80};
 const COLOURS = {
     BUTTON_BG: "lightgray",
     BUTTON_ACTIVE: "steelblue",
     BAR_FILL: "steelblue",
     LINE_STROKE: "steelblue",
-    countryColorMap: { "US": "#2E3A87", "CN": "#E5E5E5", "UK": "#9B4F96", "RU": "#F1C6D1" },
+    countryColorMap: {"US": "#2E3A87", "CN": "#E5E5E5", "UK": "#9B4F96", "RU": "#F1C6D1"},
     starrySkyColorsArray: ["#1B4F6C", "#4F9AC8", "#D9A8D3", "#D9F2FF"]
 };
 
-const stateCode = {
-    "US": "United States",
-    "CN": "China",
-    "UK": "United Kingdom",
-    "RU": "Russian Federation",
-    "IN": "India",
-    "UY": "Uruguay",
-    "CA": "Canada",
-    "I": "Italy",
-    "I-EU": "Italy",
-    "I-ESA": "Italy",
-    "F": 'France',
-    "J": "Japan",
-    "D": "Germany",
-    "KR": "South Korea",
-    "E": "Spain",
-    "L": "Luxembourg",
-    "SG": "Singapore"
-}
-
-const countryFlags = {
-    "US": "/img/flags/US.png",
-    "CN": "/img/flags/CN.png",
-    "IN": "/img/flags/IN.png",
-    "UK": "/img/flags/UK.png",
-    "RU": "/img/flags/RU.png",
-    "UY": "/img/flags/UY.png",
-    "CA": "/img/flags/CA.png",
-    "I": "/img/flags/I.png",
-    "I-EU": "/img/flags/I.png",
-    "I-ESA": "/img/flags/I.png",
-    "F": "/img/flags/F.png",
-    "J": "/img/flags/J.png",
-    "D": "/img/flags/D.png",
-    "KR": "/img/flags/KR.png",
-    "E": "/img/flags/E.png",
-    "L": "/img/flags/L.png",
-    "SG": "/img/flags/SG.png",
-}
+/** Using `ctx.COUNTRY_MAP[d.key]` to get the fullName / iso2Code of the country */
 
 const colorScale = d3.scaleOrdinal(COLOURS.starrySkyColorsArray);
 
@@ -80,34 +42,30 @@ function debounce(func, wait) {
     };
 }
 
-function changeTime(data) {
-    const inputDate = Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime);
-    updateBarPlot(data, inputDate);
-}
-
 function updateBarPlot(data, currentDate) {
     try {
         const currentDiv = document.getElementById("vmagHist");
         const oneYearAgo = new Date(currentDate.getTime() - 365 * 24 * 60 * 60 * 1000);
         // let filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
         // filteredData = filteredData.filter(d => !selectedCountry.includes(d.SatState));
-        let filteredData = data.filter(d => 
-            d.Launch_Date >= oneYearAgo && 
+        let filteredData = data.filter(d =>
+            d.Launch_Date >= oneYearAgo &&
             d.Launch_Date <= currentDate &&
-            !nonselectedCountry.includes(d.SatState) 
+            !nonselectedCountry.includes(d.SatState)
         );
-        
+
 
         let currentYear = currentDate.getFullYear()
         let totalCount = filteredData.length;
-
 
         let stateCount;
         if (plotType === "Country") {
             stateCount = Array.from(d3.group(filteredData, d => d.SatState), ([key, values]) => ({
                 key,
                 value: values.length,
-                satStates: key
+                satStates: key,
+                code: ctx.COUNTRY_MAP[key]?.iso2Code || "xx",
+                fullNmae: ctx.COUNTRY_MAP[key]?.fullName || key
             }));
         } else if (plotType === "Agent") {
             stateCount = Array.from(d3.group(filteredData, d => d.SatOwner), ([key, values]) => ({
@@ -127,7 +85,7 @@ function updateBarPlot(data, currentDate) {
         // add log value for stateCount
         stateCount = stateCount.map(d => ({
             ...d,
-            logValue: logScale(d.value) 
+            logValue: logScale(d.value)
         }));
 
 
@@ -164,7 +122,6 @@ function updateBarPlot(data, currentDate) {
             .attr("width", d => xBar(d.logValue));
 
         // Enter new bars
-
         bars.enter()
             .append("rect")
             .attr("class", "bar")
@@ -176,7 +133,7 @@ function updateBarPlot(data, currentDate) {
             .on("mouseover", function (event, d) {
                 d3.select(this)
                     .append("title")
-                    .text(() => stateCode[d.key] || d.key); // Use dictionary for full name
+                    .text(() => d.fullNmae);
             })
             .transition().duration(500)
             .attr("width", d => xBar(d.logValue));
@@ -224,22 +181,22 @@ function updateBarPlot(data, currentDate) {
             //  (currentYear)
             svgBar.append("text")
                 .attr("class", "dynamic-text year-text")
-                .attr("x", currentDiv.offsetWidth - margin.bottom * 4) 
-                .attr("y", currentDiv.offsetHeight / 2) 
-                .attr("text-anchor", "end") 
+                .attr("x", currentDiv.offsetWidth - margin.bottom * 4)
+                .attr("y", currentDiv.offsetHeight / 2)
+                .attr("text-anchor", "end")
                 .style("fill", "lightgray")
-                .style("font-size", "32px") 
+                .style("font-size", "32px")
                 .style("font-weight", "bold")
                 .text(`${currentYear}`);
 
             //  (totalCount)
             svgBar.append("text")
                 .attr("class", "dynamic-text count-text")
-                .attr("x", currentDiv.offsetWidth - margin.bottom * 4) 
-                .attr("y", currentDiv.offsetHeight / 2 + margin.bottom) 
-                .attr("text-anchor", "end") 
+                .attr("x", currentDiv.offsetWidth - margin.bottom * 4)
+                .attr("y", currentDiv.offsetHeight / 2 + margin.bottom)
+                .attr("text-anchor", "end")
                 .style("fill", "lightgray")
-                .style("font-size", "20px") 
+                .style("font-size", "20px")
                 .text(`Total: ${totalCount}`);
 
             // Update existing images
@@ -248,17 +205,24 @@ function updateBarPlot(data, currentDate) {
                 .attr("y", d => yBar(d.key)) // Vertically center the flag image
                 .attr("width", yBar.bandwidth()) // Set the flag width
                 .attr("height", yBar.bandwidth()) // Set the flag height
-                .attr("xlink:href", d => countryFlags[d.key] || "/img/flags/flag.png"); // Update image source
+                .attr("xlink:href", null) // Remove href for SVG images
+                .each(function (d) {
+                    d3.select(this)
+                        .html(`<img src="https://hatscripts.github.io/circle-flags/flags/${d.code?.toLowerCase()}.svg" width="24px" alt="">`);
+                });
 
             // Enter new images
             imgs.enter()
-                .append("image")
+                .append("foreignObject")
                 .attr("class", "countryImg")
                 .attr("x", d => xBar(d.logValue) + 10) // Position to the right of the bar
                 .attr("y", d => yBar(d.key)) // Vertically center the image
                 .attr("width", yBar.bandwidth()) // Set the flag width
                 .attr("height", yBar.bandwidth()) // Set the flag height
-                .attr("xlink:href", d => countryFlags[d.key] || "/img/flags/flag.png"); // Default flag if not found
+                .each(function (d) {
+                    d3.select(this)
+                        .html(`<img src="https://hatscripts.github.io/circle-flags/flags/${d.code?.toLowerCase()}.svg" width="24px" alt="">`);
+                });
 
             // Remove exiting images
             imgs.exit().remove();
@@ -278,10 +242,10 @@ function updateBarPlot(data, currentDate) {
 function initBarPlot() {
     try {
         const vmagHistDiv = document.getElementById('vmagHist');
-        const { clientWidth: currentWidth, clientHeight: currentHeight } = vmagHistDiv;
+        const {clientWidth: currentWidth, clientHeight: currentHeight} = vmagHistDiv;
 
         const width = currentWidth - margin.left - margin.right;
-        const height = currentHeight - margin.top*2 - margin.bottom*2;
+        const height = currentHeight - margin.top * 2 - margin.bottom * 2;
 
         // Create SVG container
         const svgContainer = d3.select("#vmagHist")
@@ -291,7 +255,7 @@ function initBarPlot() {
             .attr("height", currentHeight);
 
         svgBar = svgContainer.append("g")
-            .attr("transform", `translate(${margin.left},${margin.top*2})`);
+            .attr("transform", `translate(${margin.left},${margin.top * 2})`);
 
         // Define scales
         xBar = d3.scaleLinear().range([0, width]);
@@ -310,10 +274,9 @@ function initBarPlot() {
             .attr("transform", `translate(${margin.left},${margin.top - 20})`);
 
         const buttons = [
-            { id: "button-country", label: "Country" },
-            { id: "button-agent", label: "Agent" }
+            {id: "button-country", label: "Country"},
+            {id: "button-agent", label: "Agent"}
         ];
-
 
 
         const buttonGroups = toggleBar.selectAll(".button-group")
@@ -350,59 +313,59 @@ function initBarPlot() {
             .style("font-size", "12px")
             .style("cursor", "pointer");
 
-            // Create filter buttons
-            const filterBar = svgContainer.append("g")
-                .attr("transform", `translate(${margin.left},${currentHeight - buttonHeight - 20})`);
+        // Create filter buttons
+        const filterBar = svgContainer.append("g")
+            .attr("transform", `translate(${margin.left},${currentHeight - buttonHeight - 20})`);
 
-            const filter_buttons = [
-                { id: "US", label: "US" },
-                { id: "CN", label: "CN" },
-                { id: "RU", label: "RU" },
-                { id: "UK", label: "UK" },
-            ];
+        const filter_buttons = [
+            {id: "US", label: "US"},
+            {id: "CN", label: "CN"},
+            {id: "RU", label: "RU"},
+            {id: "UK", label: "UK"},
+        ];
 
-            const filterGroups = filterBar.selectAll(".filter-group")
-                .data(filter_buttons)
-                .enter()
-                .append("g")
-                .attr("class", "filter-group")
-                .attr("transform", (d, i) => `translate(${i * (buttonWidth + buttonSpacing)}, 0)`);
+        const filterGroups = filterBar.selectAll(".filter-group")
+            .data(filter_buttons)
+            .enter()
+            .append("g")
+            .attr("class", "filter-group")
+            .attr("transform", (d, i) => `translate(${i * (buttonWidth + buttonSpacing)}, 0)`);
 
-            filterGroups.append("rect")
-                .attr("class", "filter-bg")
-                .attr("width", buttonWidth)
-                .attr("height", buttonHeight)
-                .attr("rx", 5)
-                .attr("ry", 5)
-                .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.countryColorMap[d.id] : COLOURS.BUTTON_BG)
-                // .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG)
-                .style("cursor", "pointer")
-                .on("click", function (event, d) {
-                    const index = nonselectedCountry.indexOf(d.id);
+        filterGroups.append("rect")
+            .attr("class", "filter-bg")
+            .attr("width", buttonWidth)
+            .attr("height", buttonHeight)
+            .attr("rx", 5)
+            .attr("ry", 5)
+            .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.countryColorMap[d.id] : COLOURS.BUTTON_BG)
+            // .style("fill", d => !nonselectedCountry.includes(d.id) ? COLOURS.BUTTON_ACTIVE : COLOURS.BUTTON_BG)
+            .style("cursor", "pointer")
+            .on("click", function (event, d) {
+                const index = nonselectedCountry.indexOf(d.id);
 
-                    if (index > -1) {
-                        nonselectedCountry.splice(index, 1); 
-                    } else {
-                        nonselectedCountry.push(d.id); 
-                    }
+                if (index > -1) {
+                    nonselectedCountry.splice(index, 1);
+                } else {
+                    nonselectedCountry.push(d.id);
+                }
 
-                    d3.selectAll(".filter-bg")
-                        // .style("fill", btn => nonselectedCountry.includes(btn.id) ? COLOURS.BUTTON_BG : COLOURS.BUTTON_ACTIVE);
-                        .style("fill", btn => !nonselectedCountry.includes(btn.id) ? COLOURS.countryColorMap[btn.id] :  COLOURS.BUTTON_BG);
-        
-                    // filter data
-                    updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
-                    console.log(nonselectedCountry)
-                });
+                d3.selectAll(".filter-bg")
+                    // .style("fill", btn => nonselectedCountry.includes(btn.id) ? COLOURS.BUTTON_BG : COLOURS.BUTTON_ACTIVE);
+                    .style("fill", btn => !nonselectedCountry.includes(btn.id) ? COLOURS.countryColorMap[btn.id] : COLOURS.BUTTON_BG);
 
-            filterGroups.append("text")
-                .attr("x", buttonWidth / 2)
-                .attr("y", buttonHeight / 2)
-                .attr("dy", "0.35em")
-                .attr("text-anchor", "middle")
-                .text(d => d.label)
-                .style("font-size", "12px")
-                .style("cursor", "pointer");
+                // filter data
+                updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
+                console.log(nonselectedCountry)
+            });
+
+        filterGroups.append("text")
+            .attr("x", buttonWidth / 2)
+            .attr("y", buttonHeight / 2)
+            .attr("dy", "0.35em")
+            .attr("text-anchor", "middle")
+            .text(d => d.label)
+            .style("font-size", "12px")
+            .style("cursor", "pointer");
 
     } catch (error) {
         console.error("Error initializing bar plot:", error);
@@ -412,7 +375,7 @@ function initBarPlot() {
 function initLineChart() {
     try {
         const linePlotDiv = document.getElementById("linePlot");
-        const { clientWidth: currentWidth, clientHeight: currentHeight } = linePlotDiv;
+        const {clientWidth: currentWidth, clientHeight: currentHeight} = linePlotDiv;
 
         const width = currentWidth - margin.left - margin.right;
         const height = currentHeight - margin.top - margin.bottom;
@@ -439,21 +402,21 @@ function initLineChart() {
         })).sort((a, b) => a.year - b.year);
 
         const logScale = d3.scaleLog()
-        .base(10)
-        .domain([1, d3.max(yearCount, d => d.value)])  
+            .base(10)
+            .domain([1, d3.max(yearCount, d => d.value)])
 
         const cumulativeYearCount = [];
         let cumulativeValue = 0;
 
         yearCount.forEach(d => {
-        cumulativeValue += d.value;  
+            cumulativeValue += d.value;
 
-        const logCumulativeValue = cumulativeValue > 0 ? logScale(cumulativeValue) : 0;  
+            const logCumulativeValue = cumulativeValue > 0 ? logScale(cumulativeValue) : 0;
 
-        cumulativeYearCount.push({
-            year: d.year,
-            cumulativeValue: logCumulativeValue  
-        });
+            cumulativeYearCount.push({
+                year: d.year,
+                cumulativeValue: logCumulativeValue
+            });
         });
 
         // console.log(cumulativeYearCount);
@@ -508,7 +471,7 @@ export function createStatViz() {
 
         const statsDiv = document.getElementById("stats");
         statsDiv.style.backgroundColor = "blue";
-        const { offsetWidth: currentWidth, offsetHeight: currentHeight } = statsDiv;
+        const {offsetWidth: currentWidth, offsetHeight: currentHeight} = statsDiv;
         // console.log(currentHeight, currentWidth);
 
         const vmagHistDiv = document.getElementById("vmagHist");
@@ -548,8 +511,10 @@ export function createStatViz() {
             updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
         }, 300));
 
-        // Update time every second
-        setInterval(() => changeTime(ctx.LAUNCHLOG.DATA), 1000);
+        // Update while Cesium clock changes
+        let updateInterval = () => updateBarPlot(ctx.LAUNCHLOG.DATA, Cesium.JulianDate.toDate(ctx.view3D.clock.currentTime));
+        ctx.view3D.clock.onTick.addEventListener(updateInterval);
+
         console.log("Finished creating statistical graphs");
     } catch (error) {
         console.error("Error creating statistical visualization:", error);

@@ -64,7 +64,7 @@ export function handleSatelliteClick() {
                     infoCard.style.display = "block";
                     infoCard.innerHTML = `
                     <div class="lead">${satData.Name}</div>
-                    <p class="mx-0 my-1 y-0">By: ${stateName}&nbsp;&nbsp;<span class="fi fi-${stateCode.toLowerCase()}"></span></p>
+                    <p class="mx-0 my-1 y-0">By: ${stateName}&nbsp;&nbsp;<img src="https://hatscripts.github.io/circle-flags/flags/${stateCode.toLowerCase()}.svg" width="18px" alt=""></p>
                     <p class="mx-0 my-1 y-0">From: ${new Date(satData.Launch_Date).toUTCString().slice(5, 16)}</p>
                     <p class="mx-0 my-1 y-0">Type: ${ORBIT_TYPES[satData.Orbit_Type]?.name || "Unknown"}</p>
                     <p class="mx-0 my-1 y-0">

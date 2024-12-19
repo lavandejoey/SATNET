@@ -45,23 +45,22 @@ export const ctx = {
 
     SAT_GROUP: {
         /****************************************** Communication Satellites ******************************************/
-        // STARLINK: {
-        //     NAME: "Starlink",
-        //     CATEGORY: "Communications",
-        //     COLOR: Cesium.Color.ORANGERED,
-        //     CACHE_KEY: "starlink_tle_cache",
-        //     URL: "/data/tle/StarlinkTLE.txt", // Configurable via environment if needed
-        //     DATA: null, // To be populated with Starlink TLE data
-        //     ENTITY: [],
-        //     SELECTED: true,
-        // },
+        STARLINK: {
+            NAME: "Starlink",
+            CATEGORY: "Communications",
+            COLOR: Cesium.Color.CORAL,
+            CACHE_KEY: "starlink_tle_cache",
+            URL: "/data/tle/StarlinkTLE.txt",
+            DATA: null,
+            ENTITY: [],
+            SELECTED: true,
+        },
         /******************************************* Navigation Satellites *******************************************/
         GPS: {
             NAME: "GPS Operational",
             CATEGORY: "Navigation",
-            COLOR: Cesium.Color.LIGHTGREEN,
+            COLOR: Cesium.Color.MEDIUMAQUAMARINE,
             CACHE_KEY: "gps_tle_cache",
-            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=gps-ops&FORMAT=tle",
             URL: "/data/tle/GPSTLE.txt",
             DATA: null,
             ENTITY: [],
@@ -70,9 +69,8 @@ export const ctx = {
         GLONASS: {
             NAME: "GLONASS Operational",
             CATEGORY: "Navigation",
-            COLOR: Cesium.Color.LIGHTYELLOW,
+            COLOR: Cesium.Color.GOLD,
             CACHE_KEY: "glonass_tle_cache",
-            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=glo-ops&FORMAT=tle",
             URL: "/data/tle/GLONASSTLE.txt",
             DATA: null,
             ENTITY: [],
@@ -81,20 +79,18 @@ export const ctx = {
         BEIDOU: {
             NAME: "Beidou",
             CATEGORY: "Navigation",
-            COLOR: Cesium.Color.YELLOWGREEN,
+            COLOR: Cesium.Color.LIMEGREEN,
             CACHE_KEY: "BEIDOU_tle_cache",
-            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=beidou&FORMAT=tle",
             URL: "/data/tle/beidouTLE.txt",
-            DATA: null, // To be populated with BEIDOU TLE data
+            DATA: null,
             ENTITY: [],
             SELECTED: true,
         },
         GALILEO: {
             NAME: "Galileo",
             CATEGORY: "Navigation",
-            COLOR: Cesium.Color.BLUE,
+            COLOR: Cesium.Color.DODGERBLUE,
             CACHE_KEY: "galileo_tle_cache",
-            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=galileo&FORMAT=tle",
             URL: "/data/tle/GalileoTLE.txt",
             DATA: null,
             ENTITY: [],
@@ -104,9 +100,8 @@ export const ctx = {
         NOAA: {
             NAME: "NOAA",
             CATEGORY: "Weather",
-            COLOR: Cesium.Color.CYAN,
+            COLOR: Cesium.Color.TURQUOISE,
             CACHE_KEY: "NOAA_tle_cache",
-            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=noaa&FORMAT=tle",
             URL: "/data/tle/NOAATLE.txt",
             DATA: null,
             ENTITY: [],
@@ -115,27 +110,14 @@ export const ctx = {
         GOES: {
             NAME: "GOES",
             CATEGORY: "Weather",
-            COLOR: Cesium.Color.DEEPSKYBLUE,
+            COLOR: Cesium.Color.SKYBLUE,
             CACHE_KEY: "GOES_tle_cache",
-            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=goes&FORMAT=tle",
             URL: "/data/tle/GOESTLE.txt",
             DATA: null,
             ENTITY: [],
             SELECTED: true,
         },
-        /******************************************** Scientific Satellites ********************************************/
-        GEODETIC: {
-            NAME: "Geodetic",
-            CATEGORY: "Scientific",
-            COLOR: Cesium.Color.PURPLE,
-            CACHE_KEY: "geodetic_tle_cache",
-            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=geodetic&FORMAT=tle",
-            URL: "/data/tle/GeodeticTLE.txt",
-            DATA: null,
-            ENTITY: [],
-            SELECTED: true,
-        }
-    },
+    }
 };
 
 // Cesium Access Token from environment variables

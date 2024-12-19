@@ -5,7 +5,6 @@
     "bootstrap": "^5.3.3",
     "cesium": "^1.123.1",
     "d3": "^7.9.0",
-    "flag-icons": "^7.2.3",
     "satellite.js": "^5.0.0",
     "vite": "^5.4.11",
     "vite-plugin-cesium": "^1.2.23"
