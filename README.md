@@ -1,4 +1,4 @@
-# SatNet
+# SATNET
 
 ---
 
