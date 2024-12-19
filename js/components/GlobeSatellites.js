@@ -16,7 +16,7 @@ export function handleSatelliteClick() {
             const satData = ctx.currentSatelliteEntity.properties?.satData?.getValue();
             ctx.currentSatelliteEntity.label.show = new Cesium.CallbackProperty(() => {
                 const cameraHeight = ctx.view3D.camera.positionCartographic.height;
-                return cameraHeight - satData.Orbit_Altitude <= 1e4;
+                return cameraHeight - satData.Orbit_Altitude <= 1e7;
             }, false);
             ctx.currentSatelliteEntity.outlineColor = undefined;
             ctx.currentSatelliteEntity = null;
@@ -64,15 +64,14 @@ export function handleSatelliteClick() {
                 if (infoCard) {
                     infoCard.style.display = "block";
                     infoCard.innerHTML = `
-                        <div class="lead">${satData.Name}</div>
-                        <p class="mx-0 my-1 y-0">By: ${stateName}&nbsp;&nbsp;<img src="${flagSvg}" width="18px" alt=""></p>
-                        <p class="mx-0 my-1 y-0">From: ${new Date(satData.Launch_Date).toUTCString().slice(5, 16)}</p>
-                        <p class="mx-0 my-1 y-0">Type: ${ORBIT_TYPES[satData.Orbit_Type]?.name || "Unknown"}</p>
-                        <p class="mx-0 my-1 y-0">
+                        <div>${satData.Name}</div>
+                        <p class="text-light text-opacity-75 mx-0 my-1 y-0" style="font-size: 0.8rem">Launched by &nbsp;<img src="${flagSvg}" width="15px" alt="">&nbsp; at ${new Date(satData.Launch_Date).toUTCString().slice(5, 16)}</p>
+                        <p class="text-light text-opacity-75 mx-0 my-1 y-0" style="font-size: 0.8rem">Type: ${ORBIT_TYPES[satData.Orbit_Type]?.name || "Unknown"}</p>
+                        <p class="text-light text-opacity-50 mx-0 my-1 y-0" style="font-size: 0.8rem">
                             <span>Alt: ${(satData.Orbit_Altitude / 1e3).toFixed(0)} km</span>&nbsp;&nbsp;
                             <span id="velo">Velocity: N/A km/s</span>
                         </p>
-                        <p id="position" class="mx-0 my-1 y-0">Position: N/A, N/A</p>
+                        <p id="position" class="text-white-50 mx-0 my-1 y-0" style="font-size: 0.8rem">Loc: N/A, N/A</p>
                     `;
                 }
                 // Generate and display orbit
@@ -177,7 +176,7 @@ function updateSatelliteInfo(satelliteEntity) {
 
     if (velo && position) {
         velo.textContent = `Velocity: ${speedFormatted} km/s`;
-        position.textContent = `Position: ${latitudeFormatted}, ${longitudeFormatted}`;
+        position.textContent = `Loc: ${latitudeFormatted}, ${longitudeFormatted}`;
     }
 }
 
@@ -251,7 +250,7 @@ function createSatelliteEntity(satGroup, satData) {
             pixelOffset: new Cesium.Cartesian2(0, -10),
             show: new Cesium.CallbackProperty(() => {
                 const cameraHeight = ctx.view3D.camera.positionCartographic.height;
-                return (cameraHeight - satData.Orbit_Altitude) <= 1e4;
+                return (cameraHeight - satData.Orbit_Altitude) <= 1e7;
             }, false),
         },
         properties: {

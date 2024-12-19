@@ -48,8 +48,9 @@ export const ctx = {
         STARLINK: {
             NAME: "Starlink",
             CATEGORY: "Communications",
-            COLOR: Cesium.Color.CORAL,
+            COLOR: Cesium.Color.ROSYBROWN,
             CACHE_KEY: "starlink_tle_cache",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle",
             URL: "/data/tle/StarlinkTLE.txt",
             DATA: null,
             ENTITY: [],
@@ -59,7 +60,7 @@ export const ctx = {
         GPS: {
             NAME: "GPS Operational",
             CATEGORY: "Navigation",
-            COLOR: Cesium.Color.MEDIUMAQUAMARINE,
+            COLOR: Cesium.Color.BROWN,
             CACHE_KEY: "gps_tle_cache",
             URL: "/data/tle/GPSTLE.txt",
             DATA: null,
@@ -69,7 +70,7 @@ export const ctx = {
         GLONASS: {
             NAME: "GLONASS Operational",
             CATEGORY: "Navigation",
-            COLOR: Cesium.Color.GOLD,
+            COLOR: Cesium.Color.MISTYROSE,
             CACHE_KEY: "glonass_tle_cache",
             URL: "/data/tle/GLONASSTLE.txt",
             DATA: null,
@@ -79,7 +80,7 @@ export const ctx = {
         BEIDOU: {
             NAME: "Beidou",
             CATEGORY: "Navigation",
-            COLOR: Cesium.Color.LIMEGREEN,
+            COLOR: Cesium.Color.DARKSALMON,
             CACHE_KEY: "BEIDOU_tle_cache",
             URL: "/data/tle/beidouTLE.txt",
             DATA: null,
@@ -89,7 +90,7 @@ export const ctx = {
         GALILEO: {
             NAME: "Galileo",
             CATEGORY: "Navigation",
-            COLOR: Cesium.Color.DODGERBLUE,
+            COLOR: Cesium.Color.CORAL,
             CACHE_KEY: "galileo_tle_cache",
             URL: "/data/tle/GalileoTLE.txt",
             DATA: null,
@@ -100,7 +101,7 @@ export const ctx = {
         NOAA: {
             NAME: "NOAA",
             CATEGORY: "Weather",
-            COLOR: Cesium.Color.TURQUOISE,
+            COLOR: Cesium.Color.DODGERBLUE,
             CACHE_KEY: "NOAA_tle_cache",
             URL: "/data/tle/NOAATLE.txt",
             DATA: null,
@@ -110,7 +111,7 @@ export const ctx = {
         GOES: {
             NAME: "GOES",
             CATEGORY: "Weather",
-            COLOR: Cesium.Color.SKYBLUE,
+            COLOR: Cesium.Color.ROYALBLUE,
             CACHE_KEY: "GOES_tle_cache",
             URL: "/data/tle/GOESTLE.txt",
             DATA: null,
