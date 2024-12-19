@@ -33,8 +33,8 @@ export function dataUpdate(data, currentDate) {
     const filteredData = data.filter(d => d.Launch_Date >= oneYearAgo && d.Launch_Date <= currentDate);
     ctx.NUM_SC = Object.fromEntries(
         d3.group(filteredData, d => d.SatState)
-            .entries() 
-            .map(([key, values]) => [key, values.length]) 
+            .entries()
+            .map(([key, values]) => [key, values.length])
     );
     return null;
 }
@@ -80,8 +80,8 @@ export async function loadSites() {
         }));
         let cleanedData = cleanDataColumns(parsedData, SITE_REQUIRED_COLUMNS);
         cleanedData = cleanedData.filter(
-            d => d.Type == "LS" && d.TStart!='-' && d.TStart &&
-            d.TStart <= 2011 && d.TStop!='-');
+            d => d.Type == "LS" && d.TStart != '-' && d.TStart &&
+                d.TStart <= 2011 && d.TStop != '-');
         console.log(cleanedData);
         ctx.SITES.DATA = cleanedData.reduce((acc, site) => {
             const siteKey = site["#Site"].trim();
@@ -376,4 +376,34 @@ function satellitesAlignments(satGroup, rawName) {
     }
     if (!launchDate || !launchState) console.warn(`Geodetic: ${rawName} --> ${name}, ${launchDate}, ${launchState}`);
     return [name, launchDate, launchState];
+}
+
+
+export async function getFlagSvg(countryCode) {
+    const cacheKey = `flag_${countryCode}`;
+    const cachedSvg = localStorage.getItem(cacheKey);
+
+    if (cachedSvg) {
+        // If SVG is cached, return as a data URI
+        return `data:image/svg+xml;base64,${btoa(cachedSvg)}`;
+    }
+
+    const url = `https://hatscripts.github.io/circle-flags/flags/${countryCode.toLowerCase()}.svg`;
+
+    try {
+        const response = await fetch(url);
+
+        if (response.ok) {
+            const svgText = await response.text();
+            // Cache the SVG content in localStorage
+            localStorage.setItem(cacheKey, svgText);
+            // Return as a data URI
+            return `data:image/svg+xml;base64,${btoa(svgText)}`;
+        }
+    } catch (error) {
+        console.error(`Failed to fetch flag for ${countryCode}:`, error);
+    }
+
+    // Fallback: Return a generic placeholder or null
+    return 'path_to_fallback_image.svg'; // Provide a valid fallback path
 }

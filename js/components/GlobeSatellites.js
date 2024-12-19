@@ -2,7 +2,7 @@
 import * as satellite from "satellite.js";
 import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
-import {loadOrbitsTLEDate} from "/js/utils/data";
+import {getFlagSvg, loadOrbitsTLEDate} from "/js/utils/data";
 import {ORBIT_TYPES} from "/js/utils/constants.js";
 
 let updateInterval = null;
@@ -60,18 +60,19 @@ export function handleSatelliteClick() {
                 // Display the satellite info in the fixed info card
                 const stateName = ctx.COUNTRY_MAP[satData.Launch_State]?.fullName || "Unknown";
                 const stateCode = ctx.COUNTRY_MAP[satData.Launch_State]?.iso2Code || "XX";
+                const flagSvg = await getFlagSvg(stateCode);
                 if (infoCard) {
                     infoCard.style.display = "block";
                     infoCard.innerHTML = `
-                    <div class="lead">${satData.Name}</div>
-                    <p class="mx-0 my-1 y-0">By: ${stateName}&nbsp;&nbsp;<img src="https://hatscripts.github.io/circle-flags/flags/${stateCode.toLowerCase()}.svg" width="18px" alt=""></p>
-                    <p class="mx-0 my-1 y-0">From: ${new Date(satData.Launch_Date).toUTCString().slice(5, 16)}</p>
-                    <p class="mx-0 my-1 y-0">Type: ${ORBIT_TYPES[satData.Orbit_Type]?.name || "Unknown"}</p>
-                    <p class="mx-0 my-1 y-0">
-                        <span>Alt: ${(satData.Orbit_Altitude / 1e3).toFixed(0)} km</span>&nbsp;&nbsp;
-                        <span id="velo">Velocity: N/A km/s</span>
-                    </p>
-                    <p id="position" class="mx-0 my-1 y-0">Position: N/A, N/A</p>
+                        <div class="lead">${satData.Name}</div>
+                        <p class="mx-0 my-1 y-0">By: ${stateName}&nbsp;&nbsp;<img src="${flagSvg}" width="18px" alt=""></p>
+                        <p class="mx-0 my-1 y-0">From: ${new Date(satData.Launch_Date).toUTCString().slice(5, 16)}</p>
+                        <p class="mx-0 my-1 y-0">Type: ${ORBIT_TYPES[satData.Orbit_Type]?.name || "Unknown"}</p>
+                        <p class="mx-0 my-1 y-0">
+                            <span>Alt: ${(satData.Orbit_Altitude / 1e3).toFixed(0)} km</span>&nbsp;&nbsp;
+                            <span id="velo">Velocity: N/A km/s</span>
+                        </p>
+                        <p id="position" class="mx-0 my-1 y-0">Position: N/A, N/A</p>
                     `;
                 }
                 // Generate and display orbit

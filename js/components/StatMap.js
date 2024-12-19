@@ -10,6 +10,7 @@
 import * as d3 from "d3";
 import * as Cesium from "cesium";
 import {ctx} from "/js/utils/config";
+import {getFlagSvg} from "/js/utils/data.js";
 
 const margin = {top: 20, right: 60, bottom: 40, left: 80};
 const COLOURS = {
@@ -164,7 +165,7 @@ function updateBarPlot(data, currentDate) {
             .attr("y", d => yBar(d.key) + yBar.bandwidth() / 2) // Vertically center the label
             .attr("dy", "0.35em") // Offset to align vertically with the bar
             .style("font-size", "12px")
-            .style("fill", "#000") // Color for the text
+            .style("fill", "#fff")
             .text(d => d.value); // Set the text to the bar's value
 
         labels.exit()
@@ -204,24 +205,21 @@ function updateBarPlot(data, currentDate) {
                 .attr("x", d => xBar(d.logValue) + 10) // Adjust position slightly to the right of the bar
                 .attr("y", d => yBar(d.key)) // Vertically center the flag image
                 .attr("width", yBar.bandwidth()) // Set the flag width
-                .attr("height", yBar.bandwidth()) // Set the flag height
-                .attr("xlink:href", null) // Remove href for SVG images
-                .each(function (d) {
-                    d3.select(this)
-                        .html(`<img src="https://hatscripts.github.io/circle-flags/flags/${d.code?.toLowerCase()}.svg" width="24px" alt="">`);
-                });
+                .attr("height", yBar.bandwidth()); // Set the flag height
 
             // Enter new images
             imgs.enter()
                 .append("foreignObject")
                 .attr("class", "countryImg")
-                .attr("x", d => xBar(d.logValue) + 10) // Position to the right of the bar
-                .attr("y", d => yBar(d.key)) // Vertically center the image
-                .attr("width", yBar.bandwidth()) // Set the flag width
-                .attr("height", yBar.bandwidth()) // Set the flag height
-                .each(function (d) {
-                    d3.select(this)
-                        .html(`<img src="https://hatscripts.github.io/circle-flags/flags/${d.code?.toLowerCase()}.svg" width="24px" alt="">`);
+                .attr("x", d => xBar(d.logValue) + 10)
+                .attr("y", d => yBar(d.key))
+                .attr("width", yBar.bandwidth())
+                .attr("height", yBar.bandwidth())
+                .append("xhtml:div")
+                .style("text-align", "center")
+                .each(async function (d) {
+                    const flagSvg = await getFlagSvg(d.code);
+                    d3.select(this).html(`<img src="${flagSvg}" width="24px" alt="">`);
                 });
 
             // Remove exiting images
