@@ -1,7 +1,8 @@
 // /js/cesium.js
+import "flag-icons/css/flag-icons.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 import "bootstrap";
 import * as Cesium from "cesium";
 import {MapViewer} from "/js/components/MapViewer";

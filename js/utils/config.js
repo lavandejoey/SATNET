@@ -1,5 +1,6 @@
 // js/utils/config.js
 import * as Cesium from "cesium";
+import * as d3 from "d3";
 
 // Global context object to manage shared state
 export const ctx = {
@@ -17,6 +18,10 @@ export const ctx = {
     currentSatelliteEntity: null, // Current satellite entity
     currentOrbitEntity: null, // Current orbit entity
     currentSiteEntity: null, // Current site entity
+
+    // load json /data/StateMap.json in dictionary
+    // key: {fullName iso2Code}
+    COUNTRY_MAP: await d3.json("/data/StateMap.json"),
 
     LAUNCHLOG: {
         NAME: "LaunchLog",
@@ -103,6 +108,17 @@ export const ctx = {
             CACHE_KEY: "NOAA_tle_cache",
             // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=noaa&FORMAT=tle",
             URL: "/data/tle/NOAATLE.txt",
+            DATA: null,
+            ENTITY: [],
+            SELECTED: true,
+        },
+        GOES: {
+            NAME: "GOES",
+            CATEGORY: "Weather",
+            COLOR: Cesium.Color.DEEPSKYBLUE,
+            CACHE_KEY: "GOES_tle_cache",
+            // URL: "https://celestrak.org/NORAD/elements/gp.php?GROUP=goes&FORMAT=tle",
+            URL: "/data/tle/GOESTLE.txt",
             DATA: null,
             ENTITY: [],
             SELECTED: true,

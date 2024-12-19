@@ -38,8 +38,6 @@ export function dataUpdate(data, currentDate) {
                 .map(([key, values]) => [key, values.length]) // 构造 [key, value] 的键值对
         );
     }, 1000);
-    
-    return;
 }
 
 function parseStringDate(rawDatetime) {
@@ -116,11 +114,11 @@ export async function loadCountry() {
         }));
 
         ctx.COUNTRY.DATA = parsedData.reduce((acc, site) => {
-            const country = site["SatelliteState"].trim(); 
-            const longitude = parseFloat(site["Longitude"]); 
-            const latitude = parseFloat(site["Latitude"]); 
+            const country = site["SatelliteState"].trim();
+            const longitude = parseFloat(site["Longitude"]);
+            const latitude = parseFloat(site["Latitude"]);
 
-            acc[country] = { Longitude: longitude, Latitude: latitude };
+            acc[country] = {Longitude: longitude, Latitude: latitude};
             // ctx.NUM_SC[country] = 0;
             return acc;
         }, {});
@@ -176,20 +174,9 @@ export async function loadLaunchLog() {
     }
 }
 
-function determineOrbitType(satrec) {
-    // Semi-major axis in meters
-    const semiMajorAxis = satrec.a * EARTH_RADIUS_METERS;
-    // Orbital altitude in meters
-    const altitude = semiMajorAxis - EARTH_RADIUS_METERS
-    // Inclination in degrees
-    const inclination = Cesium.Math.toDegrees(satrec.inclo);
-
+function determineOrbitType(altitude, inclination) {
     // Check for Sun-synchronous orbit
-    if (
-        inclination >= ORBIT_TYPES.SSO.inclMin &&
-        inclination <= ORBIT_TYPES.SSO.inclMax &&
-        altitude < ORBIT_TYPES.LEO.maxAltitude
-    ) {
+    if (inclination >= ORBIT_TYPES.SSO.inclMin && inclination <= ORBIT_TYPES.SSO.inclMax && altitude < ORBIT_TYPES.LEO.maxAltitude) {
         return ORBIT_TYPES.SSO.id;
     }
 
@@ -235,7 +222,13 @@ export async function loadOrbitsTLEDate(satGroup) {
                 continue;
             }
             const satRec = satellite.twoline2satrec(line1, line2);
-            const orbitType = determineOrbitType(satRec);
+            // Semi-major axis in meters
+            const semiMajorAxis = satRec.a * EARTH_RADIUS_METERS;
+            // Orbital altitude in meters
+            const altitude = semiMajorAxis - EARTH_RADIUS_METERS
+            // Inclination in degrees
+            const inclination = Cesium.Math.toDegrees(satRec.inclo);
+            const orbitType = determineOrbitType(altitude, inclination);
 
             // Name Date with some special processing
             const [name, launchDate, launchState] = satellitesAlignments(satGroup, lines[idx].trim());
@@ -248,6 +241,7 @@ export async function loadOrbitsTLEDate(satGroup) {
                     Launch_State: launchState,
                     SatRec: satRec,
                     Orbit_Type: orbitType,
+                    Orbit_Altitude: altitude,
                 });
             } else {
                 console.warn(`Failed to process TLE data for ${name}, ld:${launchDate}, rec:${satRec}`);
@@ -356,6 +350,17 @@ function satellitesAlignments(satGroup, rawName) {
             });
             // console.log(`NOAA: ${name}, ${launchDate}`);
             break;
+        case ctx.SAT_GROUP.GOES:
+            // find "GOES \d{1,2}"
+            name = rawName.match(/GOES \d{1,2}/)[0].toString();
+            ctx.LAUNCHLOG.DATA.find(row => {
+                if (row.Name.toLowerCase() === name.toLowerCase()) {
+                    launchDate = row.Launch_Date;
+                    launchState = row.LVState;
+                }
+            });
+            break;
+        /********************************************* Science Satellites *********************************************/
         case ctx.SAT_GROUP.GEODETIC:
             name = rawName.split("(")[0].replaceAll(/ 1$/g, "").replaceAll("COSMOS", "Kosmos").trim().replaceAll(" ", "-");
             ctx.LAUNCHLOG.DATA.find(row => {
