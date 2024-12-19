@@ -54,7 +54,7 @@ async function loadViz() {
     displaySatellites();
 
     //Display the satellites in 2D
-    display2DSites();
+    // display2DSites();
     display2DSatellites();
     display2DCountry();
     

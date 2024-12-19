@@ -70,16 +70,17 @@ function createSatelliteRadiusEntity(loc, launchDate, lifespan) {
                 if (progress <= 0.0) return startRadius;
                 return startRadius + progress * (maxRadius - startRadius);
             }, false),
-            // color: Cesium.Color.RED.withAlpha(0.8),
-            outlineColor: Cesium.Color.TRANSPARENT,
-            color: new Cesium.CallbackProperty((time) => {
-                const elapsed = (new Date() - startTime);
-                const progress = elapsed / lifespan;
-                if (progress >= 1.0) return Cesium.Color.RED.withAlpha(0);
-                if (progress <= 0.0) return Cesium.Color.RED.withAlpha(1);
-                // return Cesium.Color.RED.withAlpha(0.1);
-                return Cesium.Color.RED.withAlpha(startAlpha * (progress));
-            }, false),
+            color: Cesium.Color.TRANSPARENT,
+            outlineColor: Cesium.Color.RED.withAlpha(0.8),
+            // outlineColor: Cesium.Color.TRANSPARENT,
+            // color: new Cesium.CallbackProperty((time) => {
+            //     const elapsed = (new Date() - startTime);
+            //     const progress = elapsed / lifespan;
+            //     if (progress >= 1.0) return Cesium.Color.RED.withAlpha(0);
+            //     if (progress <= 0.0) return Cesium.Color.RED.withAlpha(1);
+            //     // return Cesium.Color.RED.withAlpha(0.1);
+            //     return Cesium.Color.RED.withAlpha(startAlpha * (progress));
+            // }, false),
         },
     };
 }
