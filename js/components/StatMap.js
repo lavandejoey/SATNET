@@ -65,26 +65,33 @@ function updateBarPlot(data, currentDate) {
             d.Launch_Date >= oneYearAgo &&
             d.Launch_Date <= currentDate &&
             !nonselectedCountry.includes(d.SatState)
-        );
-
+        ).map(d => {
+            return {
+                ...d,
+                stateCode: ctx.COUNTRY_MAP[d.SatState]?.iso2Code || "xx",
+                stateFullname: ctx.COUNTRY_MAP[d.SatState]?.fullName || "Unknown"
+            }
+        });
 
         let currentYear = currentDate.getFullYear()
         let totalCount = filteredData.length;
 
         let stateCount;
         if (plotType === "Country") {
-            stateCount = Array.from(d3.group(filteredData, d => d.SatState), ([key, values]) => ({
-                key: ctx.COUNTRY_MAP[key]?.iso2Code || "xx",
+            stateCount = Array.from(d3.group(filteredData, d => d.stateCode), ([key, values]) => ({
+                key: key,
                 value: values.length,
-                satStates: key,
-                code: ctx.COUNTRY_MAP[key]?.iso2Code || "xx",
-                fullNmae: ctx.COUNTRY_MAP[key]?.fullName || key
+                satStates: Array.from(new Set(values.map(v => v.SatState))),
+                code: key,
+                fullNmae: values[0].stateFullname
             }));
         } else if (plotType === "Agent") {
             stateCount = Array.from(d3.group(filteredData, d => d.SatOwner), ([key, values]) => ({
                 key,
                 value: values.length,
-                satStates: Array.from(new Set(values.map(v => v.SatState)))
+                satStates: Array.from(new Set(values.map(v => v.SatState))),
+                code: key,
+                fullNmae: values[0].stateFullname
             }));
         }
 
@@ -403,25 +410,9 @@ function initBarPlot() {
 
         // Dynamically calculate the width of each button based on the text length
         filterGroups.each(function (d) {
-            const textElement = d3.select(this).select(".button-label");
-            const textWidth = textElement.node().getComputedTextLength();
-            const buttonWidth = BUTTON_PADDING.left + SQUARE_SIZE + 10 + textWidth + BUTTON_PADDING.right;
-            const buttonHeight = SQUARE_SIZE + BUTTON_PADDING.top + BUTTON_PADDING.bottom;
-
             // Set the size of the group
             d3.select(this)
                 .attr("transform", `translate(${computeButtonPosition(d)}, 0)`);
-
-            // Set the size of the color square
-            d3.select(this).append("rect")
-                .attr("class", "button-bg")
-                .attr("x", 0)
-                .attr("y", 0)
-                .attr("width", buttonWidth)
-                .attr("height", buttonHeight)
-                // opacity 0.4 white background
-                // .style("fill", "rgba(255, 255, 255, 0.4)");
-                .style("fill", "transparent");
         });
 
     } catch (error) {
