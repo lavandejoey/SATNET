@@ -25,15 +25,18 @@ const COLOURS = {
     BUTTON_ACTIVE: "steelblue",
     BAR_FILL: "steelblue",
     LINE_STROKE: "steelblue",
-    countryColorMap: {"US": "#27296d", "CN": "#a393eb", "UK": "#7e6bc4", "RU": "#5e63b6", "F": "#5E63B6FF"},
-    starrySkyColorsArray: ['#D198E9', '#F2B3FD', '#8C5AA8', '#5A2D6C', '#E3A6F3', '#BF85D9', '#AE77C9', '#6A3F84', '#7B4C96', '#9D69B9']
+    countryColorMap: {"US": "#27296d", "CN": "#99CCFF", "GB": "#a393eb", "RU": "#0066CC", "FR": "#996699"},
+    starrySkyColorsArray: ["#112d4e", "#1f3b6e", "#2f4a8a", "#3f72af", "#4e80b5", "#5f98d2", "#6faee0", "#7db9e7", "#8cc3ec", "#9bcef1"]
+
+
+      
 };
 
 const filter_buttons = [
     {id: "CN", label: "China"},
-    {id: "F", label: "France"},
+    {id: "FR", label: "France"},
     {id: "RU", label: "Russia"},
-    {id: "UK", label: "United Kingdom"},
+    {id: "GB", label: "United Kingdom"},
     {id: "US", label: "United States"},
 ];
 
@@ -203,22 +206,22 @@ function updateBarPlot(data, currentDate) {
             //  (currentYear)
             svgBar.append("text")
                 .attr("class", "dynamic-text year-text")
-                .attr("x", currentDiv.offsetWidth - margin.bottom * 4)
-                .attr("y", currentDiv.offsetHeight / 2)
+                .attr("x", currentDiv.offsetWidth - margin.right * 4)
+                .attr("y", currentDiv.offsetHeight - margin.bottom * 8)
                 .attr("text-anchor", "end")
                 .style("fill", "lightgray")
-                .style("font-size", "32px")
+                .style("font-size", "55px")
                 .style("font-weight", "bold")
                 .text(`${currentYear}`);
 
             //  (totalCount)
             svgBar.append("text")
                 .attr("class", "dynamic-text count-text")
-                .attr("x", currentDiv.offsetWidth - margin.bottom * 4)
-                .attr("y", currentDiv.offsetHeight / 2 + margin.bottom)
+                .attr("x", currentDiv.offsetWidth - margin.right * 4)
+                .attr("y", currentDiv.offsetHeight - margin.bottom * 7)
                 .attr("text-anchor", "end")
                 .style("fill", "lightgray")
-                .style("font-size", "20px")
+                .style("font-size", "30px")
                 .text(`Total: ${totalCount}`);
 
             // Update existing images
