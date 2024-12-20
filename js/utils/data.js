@@ -64,7 +64,7 @@ export async function loadSites() {
         cleanedData = cleanedData.filter(
             d => d.Type == "LS" && d.TStart != '-' && d.TStart &&
                 d.TStart <= 2011 && d.TStop != '-');
-        console.log(cleanedData);
+        // console.log(cleanedData);
         ctx.SITES.DATA = cleanedData.reduce((acc, site) => {
             const siteKey = site["#Site"].trim();
             const longitude = parseFloat(site["Longitude"]);
@@ -146,6 +146,7 @@ export async function loadLaunchLog() {
             const launchSite = launch.Launch_Site;
             const map_loc = siteData[launchSite];
             if (map_loc) launch["loc"] = map_loc;
+            else launch["loc"] = {Longitude: 0, Latitude: 0};
         });
 
         saveToCache(ctx.LAUNCHLOG.CACHE_KEY, cleanedData, ctx.CACHE_DURATION).then(() => console.log("Fetched launch log data from server"));

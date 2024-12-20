@@ -14,6 +14,12 @@ export function display2DSatellites() {
                 const launchDate = launchData.Launch_Date; // lanch time
                 const loc = launchData.loc; // longtitude and lattitude
 
+                // Check if the location is valid
+                if (!loc || !launchDate) {
+                    console.error("Invalid location or launch dateon for", launchData, loc, launchDate);
+                    return;
+                }
+
                 if (currentTime.toDateString() === launchDate.toDateString()) {
                     const launchRadiusEntity = createSatelliteRadiusEntity(loc, launchDate, lifespan);
                     const launchEntity = createSatelliteEntity(loc);
